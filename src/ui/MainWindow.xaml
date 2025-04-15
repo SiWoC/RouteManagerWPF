@@ -1,0 +1,172 @@
+<Window x:Class="nl.siwoc.RouteManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:nl.siwoc.RouteManager"
+        mc:Ignorable="d"
+        Title="Route Manager" Height="720" Width="1280"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Route" Command="{Binding NewRouteCommand}"/>
+                <MenuItem Header="_Open Route" Command="{Binding OpenRouteCommand}"/>
+                <MenuItem Header="_Save Route" Command="{Binding SaveRouteCommand}"/>
+                <Separator/>
+                <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Zoom _In" Command="{Binding ZoomInCommand}"/>
+                <MenuItem Header="Zoom _Out" Command="{Binding ZoomOutCommand}"/>
+                <MenuItem Header="_Fit to Route" Command="{Binding FitToRouteCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Status Bar -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Zoom:" VerticalAlignment="Center"/>
+                    <Slider Width="200" 
+                            Minimum="0" 
+                            Maximum="20" 
+                            Value="{Binding ZoomLevel}"
+                            TickFrequency="1"
+                            IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- Main Content -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Map View -->
+            <Border Grid.Column="0" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1" 
+                    Margin="4">
+                <local:MapControlWrapper x:Name="mapControl"
+                                MapProvider="{Binding MapProvider, Mode=TwoWay}"
+                                Position="{Binding Center}"
+                                Zoom="{Binding ZoomLevel}"/>
+            </Border>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" 
+                         Width="4" 
+                         HorizontalAlignment="Center" 
+                         VerticalAlignment="Stretch"/>
+
+            <!-- Route Details -->
+            <Grid Grid.Column="2" Margin="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="200"/>
+                </Grid.RowDefinitions>
+
+                <!-- Map Provider Selection -->
+                <GroupBox Grid.Row="0" Header="Map Provider">
+                    <ComboBox x:Name="MapProviderComboBox"
+                             ItemsSource="{Binding MapProviders}"
+                             SelectedItem="{Binding MapProvider, Mode=TwoWay}"
+                             DisplayMemberPath="Name"/>
+                </GroupBox>
+
+                <!-- Point Details -->
+                <GroupBox Grid.Row="1" Header="Point Details">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="Name:"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" 
+                                 Text="{Binding SelectedPoint.Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="Latitude:"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" 
+                                 Text="{Binding SelectedPoint.Latitude, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Content="Longitude:"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" 
+                                 Text="{Binding SelectedPoint.Longitude, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label Grid.Row="3" Grid.Column="0" Content="Notes:"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" 
+                                 Text="{Binding SelectedPoint.Notes, UpdateSourceTrigger=PropertyChanged}"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Route Points List -->
+                <GroupBox Grid.Row="2" Header="Route Points">
+                    <DataGrid x:Name="RoutePointsDataGrid"
+                              ItemsSource="{Binding RoutePoints}"
+                              SelectedItem="{Binding SelectedPoint}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="True"
+                              CanUserDeleteRows="True"
+                              SelectionMode="Single">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Point" 
+                                          Command="{Binding AddPointCommand}"/>
+                                <MenuItem Header="Delete Point" 
+                                          Command="{Binding DeletePointCommand}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" 
+                                              Binding="{Binding Name}" 
+                                              Width="*"/>
+                            <DataGridTextColumn Header="Latitude" 
+                                              Binding="{Binding Latitude}" 
+                                              Width="Auto"/>
+                            <DataGridTextColumn Header="Longitude" 
+                                              Binding="{Binding Longitude}" 
+                                              Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window> 
