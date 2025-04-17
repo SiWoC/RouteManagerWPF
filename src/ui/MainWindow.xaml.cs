@@ -9,10 +9,6 @@ namespace nl.siwoc.RouteManager
         {
             InitializeComponent();
 
-            // Set initial position to Amsterdam
-            mapControl.Position = new PointLatLng(52.3676, 4.9041);
-            mapControl.Zoom = 15;
-
             // Set the DataContext last
             DataContext = new MainViewModel(mapControl);
         }

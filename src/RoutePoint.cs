@@ -1,14 +1,16 @@
+using GMap.NET;
+using GMap.NET.WindowsPresentation;
+using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace nl.siwoc.RouteManager
 {
-    public class RoutePoint : INotifyPropertyChanged
+    public class RoutePoint : GMapMarker, INotifyPropertyChanged
     {
         private string name;
-        private double latitude;
-        private double longitude;
         private string notes;
+        private int index;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -20,32 +22,6 @@ namespace nl.siwoc.RouteManager
                 if (name != value)
                 {
                     name = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public double Latitude
-        {
-            get => latitude;
-            set
-            {
-                if (latitude != value)
-                {
-                    latitude = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public double Longitude
-        {
-            get => longitude;
-            set
-            {
-                if (longitude != value)
-                {
-                    longitude = value;
                     OnPropertyChanged();
                 }
             }
@@ -64,12 +40,26 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public RoutePoint(string name, double latitude, double longitude, string notes = "")
+        public int Index
+        {
+            get => index;
+            set
+            {
+                if (index != value)
+                {
+                    index = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public RoutePoint(string name, double latitude, double longitude, int index, string notes = "")
+            : base(new PointLatLng(latitude, longitude))
         {
             Name = name;
-            Latitude = latitude;
-            Longitude = longitude;
             Notes = notes;
+            Index = index;
+            
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

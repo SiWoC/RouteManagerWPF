@@ -6,15 +6,17 @@ using System.Windows;
 using System.Windows.Input;
 using GMap.NET;
 using GMap.NET.MapProviders;
+using CommunityToolkit.Mvvm.Input;
+using GMap.NET.WindowsPresentation;
+using System.Reflection;
 
 namespace nl.siwoc.RouteManager
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         private string statusMessage = "Ready";
-        private int zoomLevel = 15;
         private ObservableCollection<RoutePoint> routePoints = new ObservableCollection<RoutePoint>();
-        private PointLatLng center = new PointLatLng(52.3676, 4.9041); // Default to Amsterdam
+        private PointLatLng center;
         private GMapProvider mapProvider = OpenStreetMapProvider.Instance;
         private readonly MapControlWrapper mapControl;
         private RoutePoint selectedPoint;
@@ -55,19 +57,6 @@ namespace nl.siwoc.RouteManager
                 if (statusMessage != value)
                 {
                     statusMessage = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public int ZoomLevel
-        {
-            get => zoomLevel;
-            set
-            {
-                if (zoomLevel != value)
-                {
-                    zoomLevel = value;
                     OnPropertyChanged();
                 }
             }
@@ -116,25 +105,23 @@ namespace nl.siwoc.RouteManager
         public ICommand OpenRouteCommand { get; }
         public ICommand SaveRouteCommand { get; }
         public ICommand ExitCommand { get; }
-        public ICommand ZoomInCommand { get; }
-        public ICommand ZoomOutCommand { get; }
         public ICommand FitToRouteCommand { get; }
-        public ICommand AddPointCommand { get; }
+        public ICommand AddPointAtLocationCommand { get; }
         public ICommand DeletePointCommand { get; }
 
         public MainViewModel(MapControlWrapper mapControl)
         {
             this.mapControl = mapControl;
+            this.mapControl.ShowCenter = false;
+            center = new PointLatLng(46.538615, 10.501385);
 
             // Initialize commands
             NewRouteCommand = new RelayCommand(ExecuteNewRoute);
             OpenRouteCommand = new RelayCommand(ExecuteOpenRoute);
             SaveRouteCommand = new RelayCommand(ExecuteSaveRoute);
             ExitCommand = new RelayCommand(ExecuteExit);
-            ZoomInCommand = new RelayCommand(ExecuteZoomIn);
-            ZoomOutCommand = new RelayCommand(ExecuteZoomOut);
             FitToRouteCommand = new RelayCommand(ExecuteFitToRoute);
-            AddPointCommand = new RelayCommand(ExecuteAddPoint);
+            AddPointAtLocationCommand = new RelayCommand(ExecuteAddPointAtLocation);
             DeletePointCommand = new RelayCommand(ExecuteDeletePoint);
 
             // Initialize map providers
@@ -149,6 +136,14 @@ namespace nl.siwoc.RouteManager
             {
                 MapProvider = savedProvider;
             }
+
+            // Handle map contextmenu to add points
+            mapControl.AddRoutePointRequested += (s, point) =>
+            {
+                var newPoint = new RoutePoint($"Point {RoutePoints.Count + 1}", point.Lat, point.Lng, RoutePoints.Count + 1);
+                RoutePoints.Add(newPoint);
+                StatusMessage = "Point added from map";
+            };
         }
 
         private void ExecuteNewRoute()
@@ -174,41 +169,75 @@ namespace nl.siwoc.RouteManager
             Application.Current.Shutdown();
         }
 
-        private void ExecuteZoomIn()
-        {
-            if (ZoomLevel < 20)
-            {
-                ZoomLevel++;
-                StatusMessage = $"Zoom level: {ZoomLevel}";
-            }
-        }
-
-        private void ExecuteZoomOut()
-        {
-            if (ZoomLevel > 0)
-            {
-                ZoomLevel--;
-                StatusMessage = $"Zoom level: {ZoomLevel}";
-            }
-        }
-
         private void ExecuteFitToRoute()
         {
-            // TODO: Implement fit to route functionality
+            RectLatLng? rectOfAllMarkers = mapControl.GetRectOfAllMarkers(null);
+            if (rectOfAllMarkers.HasValue)
+            {
+                // Add 20% padding to the bounds
+                var padding = new
+                {
+                    Lat = (rectOfAllMarkers.Value.Top - rectOfAllMarkers.Value.Bottom) * 0.1,
+                    Lng = (rectOfAllMarkers.Value.Right - rectOfAllMarkers.Value.Left) * 0.1
+                };
+
+                RectLatLng paddedRect = rectOfAllMarkers.Value;
+                paddedRect.Inflate(padding.Lat, padding.Lng);
+                mapControl.SetZoomToFitRect(paddedRect);
+            }
+            // same as this mapControl.ZoomAndCenterMarkers(null);
             StatusMessage = "Fitting view to route...";
         }
 
-        private void ExecuteAddPoint()
+        private void ExecuteAddPointAtLocation()
         {
-            var newPoint = new RoutePoint("New Point", 0, 0);
+            var newPoint = new RoutePoint(
+                $"Point {RoutePoints.Count + 1}",
+                mapControl.LastRightClickPosition.Lat,
+                mapControl.LastRightClickPosition.Lng,
+                RoutePoints.Count + 1
+            );
+
+            // Create marker with CustomMarkerDemo
+            var m = new GMapMarker(mapControl.LastRightClickPosition);
+            {
+                Placemark? p = null;
+                if (true)
+                {
+                    GeoCoderStatusCode status;
+                    var plret = GMapProviders.GoogleMap.GetPlacemark(mapControl.LastRightClickPosition, out status);
+                    if (status == GeoCoderStatusCode.OK && plret != null)
+                    {
+                        p = plret;
+                    }
+                }
+
+                string toolTipText;
+                if (p != null)
+                {
+                    toolTipText = p.Value.Address;
+                }
+                else
+                {
+                    toolTipText = mapControl.LastRightClickPosition.ToString();
+                }
+
+                m.Shape = new CustomMarkerDemo(mapControl, m, toolTipText, newPoint.Index);
+            }
+
+            // Add both to collections
             RoutePoints.Add(newPoint);
-            StatusMessage = "Point added";
-        }       
+            mapControl.Markers.Add(newPoint);
+            mapControl.Markers.Add(m);
+            
+            StatusMessage = "Point added from map";
+        }
 
         private void ExecuteDeletePoint()
         {
             if (SelectedPoint != null)
             {
+                mapControl.Markers.Remove(SelectedPoint);
                 RoutePoints.Remove(SelectedPoint);
                 StatusMessage = "Point deleted";
             }
@@ -217,34 +246,6 @@ namespace nl.siwoc.RouteManager
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class RelayCommand : ICommand
-    {
-        private readonly Action execute;
-        private readonly Func<bool> canExecute;
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
-        {
-            this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            this.canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return canExecute == null || canExecute();
-        }
-
-        public void Execute(object parameter)
-        {
-            execute();
         }
     }
 } 

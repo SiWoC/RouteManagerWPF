@@ -7,17 +7,17 @@
         mc:Ignorable="d"
         Title="Route Manager" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen">
-    
+
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="Margin" Value="4"/>
         </Style>
-        
+
         <Style TargetType="Label">
             <Setter Property="Margin" Value="4"/>
         </Style>
-        
+
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="4"/>
         </Style>
@@ -34,8 +34,6 @@
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="Zoom _In" Command="{Binding ZoomInCommand}"/>
-                <MenuItem Header="Zoom _Out" Command="{Binding ZoomOutCommand}"/>
                 <MenuItem Header="_Fit to Route" Command="{Binding FitToRouteCommand}"/>
             </MenuItem>
         </Menu>
@@ -43,17 +41,21 @@
         <!-- Status Bar -->
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusMessage}"/>
+                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" />
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Zoom:" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" >
+                    <Button Command="{Binding FitToRouteCommand}" Background="Transparent" BorderThickness="0" Padding="0">
+                        <Image Source="zoom-fit.1024x1024.png" Height="32" Width="32"/>
+                    </Button>
+                    <TextBlock Text="{Binding ElementName=mapControl, Path=Zoom, StringFormat='Zoom [{0}]:'}" VerticalAlignment="Center"/>
                     <Slider Width="200" 
-                            Minimum="0" 
-                            Maximum="20" 
-                            Value="{Binding ZoomLevel}"
+                            Minimum="{Binding ElementName=mapControl, Path=MinZoom}"
+                            Maximum="{Binding ElementName=mapControl, Path=MaxZoom}"
+                            Value="{Binding ElementName=mapControl, Path=Zoom}"
                             TickFrequency="1"
-                            IsSnapToTickEnabled="True"/>
+                            IsSnapToTickEnabled="True"
+                             VerticalAlignment="Center"/>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
@@ -74,7 +76,14 @@
                 <local:MapControlWrapper x:Name="mapControl"
                                 MapProvider="{Binding MapProvider, Mode=TwoWay}"
                                 Position="{Binding Center}"
-                                Zoom="{Binding ZoomLevel}"/>
+                                Zoom="13">
+                    <local:MapControlWrapper.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Route Point" 
+                                    Command="{Binding AddPointAtLocationCommand}"/>
+                        </ContextMenu>
+                    </local:MapControlWrapper.ContextMenu>
+                </local:MapControlWrapper>
             </Border>
 
             <!-- Splitter -->
@@ -121,11 +130,11 @@
 
                         <Label Grid.Row="1" Grid.Column="0" Content="Latitude:"/>
                         <TextBox Grid.Row="1" Grid.Column="1" 
-                                 Text="{Binding SelectedPoint.Latitude, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding SelectedPoint.Position.Lat, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Content="Longitude:"/>
                         <TextBox Grid.Row="2" Grid.Column="1" 
-                                 Text="{Binding SelectedPoint.Longitude, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding SelectedPoint.Position.Lng, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label Grid.Row="3" Grid.Column="0" Content="Notes:"/>
                         <TextBox Grid.Row="3" Grid.Column="1" 
@@ -147,8 +156,6 @@
                               SelectionMode="Single">
                         <DataGrid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Add Point" 
-                                          Command="{Binding AddPointCommand}"/>
                                 <MenuItem Header="Delete Point" 
                                           Command="{Binding DeletePointCommand}"/>
                             </ContextMenu>
@@ -158,10 +165,10 @@
                                               Binding="{Binding Name}" 
                                               Width="*"/>
                             <DataGridTextColumn Header="Latitude" 
-                                              Binding="{Binding Latitude}" 
+                                              Binding="{Binding Position.Lat}" 
                                               Width="Auto"/>
                             <DataGridTextColumn Header="Longitude" 
-                                              Binding="{Binding Longitude}" 
+                                              Binding="{Binding Position.Lng}" 
                                               Width="Auto"/>
                         </DataGrid.Columns>
                     </DataGrid>
