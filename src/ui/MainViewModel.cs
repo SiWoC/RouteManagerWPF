@@ -9,6 +9,10 @@ using GMap.NET.MapProviders;
 using CommunityToolkit.Mvvm.Input;
 using GMap.NET.WindowsPresentation;
 using System.Reflection;
+using System.Windows.Shapes;
+using System.Xml.Linq;
+using System.Windows.Controls;
+using System.Linq;
 
 namespace nl.siwoc.RouteManager
 {
@@ -20,6 +24,7 @@ namespace nl.siwoc.RouteManager
         private GMapProvider mapProvider = OpenStreetMapProvider.Instance;
         private readonly MapControlWrapper mapControl;
         private RoutePoint selectedPoint;
+        private RoutePoint draggedItem;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -108,12 +113,16 @@ namespace nl.siwoc.RouteManager
         public ICommand FitToRouteCommand { get; }
         public ICommand AddPointAtLocationCommand { get; }
         public ICommand DeletePointCommand { get; }
+        public ICommand SettingsCommand { get; }
+        public ICommand DragStartCommand { get; }
+        public ICommand DropCommand { get; }
+        public ICommand DragOverCommand { get; }
 
         public MainViewModel(MapControlWrapper mapControl)
         {
             this.mapControl = mapControl;
             this.mapControl.ShowCenter = false;
-            center = new PointLatLng(46.538615, 10.501385);
+            center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
 
             // Initialize commands
             NewRouteCommand = new RelayCommand(ExecuteNewRoute);
@@ -123,6 +132,7 @@ namespace nl.siwoc.RouteManager
             FitToRouteCommand = new RelayCommand(ExecuteFitToRoute);
             AddPointAtLocationCommand = new RelayCommand(ExecuteAddPointAtLocation);
             DeletePointCommand = new RelayCommand(ExecuteDeletePoint);
+            SettingsCommand = new RelayCommand(ExecuteSettings);
 
             // Initialize map providers
             foreach (var provider in MapControlWrapper.GetAllMapProviders())
@@ -137,13 +147,6 @@ namespace nl.siwoc.RouteManager
                 MapProvider = savedProvider;
             }
 
-            // Handle map contextmenu to add points
-            mapControl.AddRoutePointRequested += (s, point) =>
-            {
-                var newPoint = new RoutePoint($"Point {RoutePoints.Count + 1}", point.Lat, point.Lng, RoutePoints.Count + 1);
-                RoutePoints.Add(newPoint);
-                StatusMessage = "Point added from map";
-            };
         }
 
         private void ExecuteNewRoute()
@@ -189,57 +192,129 @@ namespace nl.siwoc.RouteManager
             StatusMessage = "Fitting view to route...";
         }
 
+        private PointLatLng? GetNearestPointOnRoad(PointLatLng point)
+        {
+            // Get the routing provider (OpenStreetMap in this case)
+            var routingProvider = GMapProviders.OpenStreetMap as RoutingProvider;
+            if (routingProvider == null) return null;
+
+            // Get a route that passes through our point
+            var route = routingProvider.GetRoute(
+                point,
+                point,
+                false, false, (int)mapControl.Zoom);
+
+            if (route == null || route.Points.Count == 0) return null;
+
+            // Find the nearest point on the route
+            var nearestPoint = route.Points
+                .OrderBy(p => GMap.NET.MapProviders.OpenStreetMapProvider.Instance.Projection.GetDistance(p, point))
+                .First();
+
+            // Check if the nearest point is within the configured distance
+            var distance = GMap.NET.MapProviders.OpenStreetMapProvider.Instance.Projection.GetDistance(nearestPoint, point);
+            if (distance > Settings.LoadRoadSnapDistance() / 1000.0) // Convert meters to kilometers
+            {
+                return null;
+            }
+
+            return nearestPoint;
+        }
+
         private void ExecuteAddPointAtLocation()
         {
-            var newPoint = new RoutePoint(
-                $"Point {RoutePoints.Count + 1}",
-                mapControl.LastRightClickPosition.Lat,
-                mapControl.LastRightClickPosition.Lng,
-                RoutePoints.Count + 1
-            );
-
-            // Create marker with CustomMarkerDemo
-            var m = new GMapMarker(mapControl.LastRightClickPosition);
+            var clickedPoint = mapControl.LastRightClickPosition;
+            var nearestRoadPoint = GetNearestPointOnRoad(clickedPoint);
+            if (nearestRoadPoint == null)
             {
-                Placemark? p = null;
-                if (true)
-                {
-                    GeoCoderStatusCode status;
-                    var plret = GMapProviders.GoogleMap.GetPlacemark(mapControl.LastRightClickPosition, out status);
-                    if (status == GeoCoderStatusCode.OK && plret != null)
-                    {
-                        p = plret;
-                    }
-                }
-
-                string toolTipText;
-                if (p != null)
-                {
-                    toolTipText = p.Value.Address;
-                }
-                else
-                {
-                    toolTipText = mapControl.LastRightClickPosition.ToString();
-                }
-
-                m.Shape = new CustomMarkerDemo(mapControl, m, toolTipText, newPoint.Index);
+                StatusMessage = "No road found at clicked point";
+                nearestRoadPoint = clickedPoint;
+            } else {
+                StatusMessage = "Point on road added from map";
             }
+
+            var newPoint = new RoutePoint(
+                mapControl,
+                RoutePoints.Count + 1,
+                nearestRoadPoint.Value
+            );
 
             // Add both to collections
             RoutePoints.Add(newPoint);
-            mapControl.Markers.Add(newPoint);
-            mapControl.Markers.Add(m);
+            mapControl.Markers.Add(newPoint.Marker);
             
-            StatusMessage = "Point added from map";
         }
 
         private void ExecuteDeletePoint()
         {
             if (SelectedPoint != null)
             {
-                mapControl.Markers.Remove(SelectedPoint);
+                mapControl.Markers.Remove(SelectedPoint.Marker);
                 RoutePoints.Remove(SelectedPoint);
                 StatusMessage = "Point deleted";
+                UpdateRoutePointIndices();
+            }
+        }
+
+        private void ExecuteSettings()
+        {
+            var settingsWindow = new SettingsWindow
+            {
+                Owner = Application.Current.MainWindow
+            };
+            if (settingsWindow.ShowDialog() == true)
+            {
+                // Update center if settings were saved
+                Center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
+                StatusMessage = "Settings saved";
+            }
+        }
+
+        public void RoutePointsDataGrid_HandleDragStart(MouseButtonEventArgs e)
+        {
+            var row = ItemsControl.ContainerFromElement((DataGrid)e.Source, e.OriginalSource as DependencyObject) as DataGridRow;
+            if (row != null)
+            {
+                draggedItem = row.Item as RoutePoint;
+                if (draggedItem != null)
+                {
+                    DragDrop.DoDragDrop(row, draggedItem, DragDropEffects.Move);
+                }
+            }
+        }
+
+        public void RoutePointsDataGrid_HandleDrop(DragEventArgs e)
+        {
+            var row = ItemsControl.ContainerFromElement((DataGrid)e.Source, e.OriginalSource as DependencyObject) as DataGridRow;
+            if (row != null && draggedItem != null)
+            {
+                var targetItem = row.Item as RoutePoint;
+                if (targetItem != null && draggedItem != targetItem)
+                {
+                    var oldIndex = RoutePoints.IndexOf(draggedItem);
+                    var newIndex = RoutePoints.IndexOf(targetItem);
+
+                    RoutePoints.RemoveAt(oldIndex);
+                    RoutePoints.Insert(newIndex, draggedItem);
+
+                    UpdateRoutePointIndices();
+                }
+            }
+            draggedItem = null;
+        }
+
+        public void RoutePointsDataGrid_HandleDragOver(DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+        }
+
+        private void UpdateRoutePointIndices()
+        {
+            // Update indices
+            for (int i = 0; i < RoutePoints.Count; i++)
+            {
+                RoutePoints[i].Index = i + 1;
             }
         }
 

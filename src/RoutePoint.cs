@@ -3,14 +3,19 @@ using GMap.NET.WindowsPresentation;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Transactions;
+using System.Windows.Shapes;
 
 namespace nl.siwoc.RouteManager
 {
-    public class RoutePoint : GMapMarker, INotifyPropertyChanged
+    public class RoutePoint : INotifyPropertyChanged
     {
+        private int index;
+        private MapControlWrapper mapControl;
         private string name;
         private string notes;
-        private int index;
+        private PointLatLng position;
+        public GMapMarker Marker { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -48,18 +53,41 @@ namespace nl.siwoc.RouteManager
                 if (index != value)
                 {
                     index = value;
+                    if (Marker != null)
+                    {
+                        (Marker.Shape as FlagMarker).FlagText.Text = value.ToString();
+                    }
                     OnPropertyChanged();
                 }
             }
         }
 
-        public RoutePoint(string name, double latitude, double longitude, int index, string notes = "")
-            : base(new PointLatLng(latitude, longitude))
+        public PointLatLng Position
         {
-            Name = name;
-            Notes = notes;
+            get => position;
+            set
+            {
+                if (position != value)
+                {
+                    position = value;
+                    if (Marker != null)
+                    {
+                        Marker.Position = value;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public RoutePoint(MapControlWrapper mapControl, int index, PointLatLng position)
+        {
+            this.mapControl = mapControl;
+            this.position = position;
             Index = index;
-            
+            Name = $"Point {Index}";
+
+            Marker = new GMapMarker(Position);
+            Marker.Shape = new FlagMarker(mapControl, Marker, Name, Index);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

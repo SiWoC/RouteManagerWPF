@@ -7,17 +7,14 @@ using GMap.NET.WindowsPresentation;
 
 namespace nl.siwoc.RouteManager
 {
-    /// <summary>
-    ///     Interaction logic for CustomMarkerDemo.xaml
-    /// </summary>
-    public partial class CustomMarkerDemo
+    public partial class FlagMarker
     {
         private Popup _popup;
         private Label _label;
         private GMapMarker _marker;
         private MapControlWrapper mapControl;
 
-        public CustomMarkerDemo(MapControlWrapper mapControl, GMapMarker marker, string title, int index)
+        public FlagMarker(MapControlWrapper mapControl, GMapMarker marker, string title, int index)
         {
             InitializeComponent();
 
@@ -31,14 +28,14 @@ namespace nl.siwoc.RouteManager
             _popup = new Popup();
             _label = new Label();
 
-            Unloaded += CustomMarkerDemo_Unloaded;
-            Loaded += CustomMarkerDemo_Loaded;
-            SizeChanged += CustomMarkerDemo_SizeChanged;
+            Unloaded += FlagMarker_Unloaded;
+            Loaded += FlagMarker_Loaded;
+            SizeChanged += FlagMarker_SizeChanged;
             MouseEnter += MarkerControl_MouseEnter;
             MouseLeave += MarkerControl_MouseLeave;
-            MouseMove += CustomMarkerDemo_MouseMove;
-            MouseLeftButtonUp += CustomMarkerDemo_MouseLeftButtonUp;
-            MouseLeftButtonDown += CustomMarkerDemo_MouseLeftButtonDown;
+            MouseMove += FlagMarker_MouseMove;
+            MouseLeftButtonUp += FlagMarker_MouseLeftButtonUp;
+            MouseLeftButtonDown += FlagMarker_MouseLeftButtonDown;
 
             _popup.Placement = PlacementMode.Mouse;
             {
@@ -53,7 +50,7 @@ namespace nl.siwoc.RouteManager
             _popup.Child = _label;
         }
 
-        void CustomMarkerDemo_Loaded(object sender, RoutedEventArgs e)
+        void FlagMarker_Loaded(object sender, RoutedEventArgs e)
         {
             /*
             if (Icon.Source.CanFreeze)
@@ -63,16 +60,16 @@ namespace nl.siwoc.RouteManager
             */
         }
 
-        void CustomMarkerDemo_Unloaded(object sender, RoutedEventArgs e)
+        void FlagMarker_Unloaded(object sender, RoutedEventArgs e)
         {
-            Unloaded -= CustomMarkerDemo_Unloaded;
-            Loaded -= CustomMarkerDemo_Loaded;
-            SizeChanged -= CustomMarkerDemo_SizeChanged;
+            Unloaded -= FlagMarker_Unloaded;
+            Loaded -= FlagMarker_Loaded;
+            SizeChanged -= FlagMarker_SizeChanged;
             MouseEnter -= MarkerControl_MouseEnter;
             MouseLeave -= MarkerControl_MouseLeave;
-            MouseMove -= CustomMarkerDemo_MouseMove;
-            MouseLeftButtonUp -= CustomMarkerDemo_MouseLeftButtonUp;
-            MouseLeftButtonDown -= CustomMarkerDemo_MouseLeftButtonDown;
+            MouseMove -= FlagMarker_MouseMove;
+            MouseLeftButtonUp -= FlagMarker_MouseLeftButtonUp;
+            MouseLeftButtonDown -= FlagMarker_MouseLeftButtonDown;
 
             _marker.Shape = null;
             Flag = null;
@@ -80,12 +77,12 @@ namespace nl.siwoc.RouteManager
             _label = null;
         }
 
-        void CustomMarkerDemo_SizeChanged(object sender, SizeChangedEventArgs e)
+        void FlagMarker_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             _marker.Offset = new Point(0, -e.NewSize.Height);
         }
 
-        void CustomMarkerDemo_MouseMove(object sender, MouseEventArgs e)
+        void FlagMarker_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && IsMouseCaptured)
             {
@@ -94,7 +91,7 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        void CustomMarkerDemo_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        void FlagMarker_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!IsMouseCaptured)
             {
@@ -102,7 +99,7 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        void CustomMarkerDemo_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        void FlagMarker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (IsMouseCaptured)
             {

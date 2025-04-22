@@ -9,7 +9,6 @@ namespace nl.siwoc.RouteManager
 {
     public class MapControlWrapper : GMapControl
     {
-        public event EventHandler<PointLatLng> AddRoutePointRequested;
         public PointLatLng LastRightClickPosition { get; private set; }
 
         public MapControlWrapper()
