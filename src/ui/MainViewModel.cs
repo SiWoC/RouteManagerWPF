@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using System.Windows.Controls;
 using System.Linq;
+using System.Collections.Specialized;
 
 namespace nl.siwoc.RouteManager
 {
@@ -25,6 +26,7 @@ namespace nl.siwoc.RouteManager
         private readonly MapControlWrapper mapControl;
         private RoutePoint selectedPoint;
         private RoutePoint draggedItem;
+        private readonly RoutePolyline routePolyline;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -87,7 +89,15 @@ namespace nl.siwoc.RouteManager
             {
                 if (routePoints != value)
                 {
+                    if (routePoints != null)
+                    {
+                        routePoints.CollectionChanged -= RoutePoints_CollectionChanged;
+                    }
                     routePoints = value;
+                    if (routePoints != null)
+                    {
+                        routePoints.CollectionChanged += RoutePoints_CollectionChanged;
+                    }
                     OnPropertyChanged();
                 }
             }
@@ -124,6 +134,10 @@ namespace nl.siwoc.RouteManager
             this.mapControl.ShowCenter = false;
             center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
 
+            // Initialize route polyline
+            routePolyline = new RoutePolyline(mapControl);
+            routePoints.CollectionChanged += RoutePoints_CollectionChanged;
+
             // Initialize commands
             NewRouteCommand = new RelayCommand(ExecuteNewRoute);
             OpenRouteCommand = new RelayCommand(ExecuteOpenRoute);
@@ -146,12 +160,17 @@ namespace nl.siwoc.RouteManager
             {
                 MapProvider = savedProvider;
             }
+        }
 
+        private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            routePolyline.UpdateRoute(RoutePoints);
         }
 
         private void ExecuteNewRoute()
         {
             RoutePoints.Clear();
+            routePolyline.Clear();
             StatusMessage = "New route created";
         }
 
