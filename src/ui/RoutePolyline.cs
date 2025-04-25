@@ -3,23 +3,18 @@ using GMap.NET.WindowsPresentation;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GMap.NET.MapProviders;
+using nl.siwoc.RouteManager;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public class RoutePolyline
     {
         private readonly MapControlWrapper mapControl;
         private GMapRoute gmapRoute;
-        private RoutingProvider rp;
 
         public RoutePolyline(MapControlWrapper mapControl)
         {
             this.mapControl = mapControl;
-            rp = mapControl.MapProvider as RoutingProvider;
-            if (rp == null)
-            {
-                rp = GMapProviders.OpenStreetMap; // use OpenStreetMap if provider does not implement routing
-            }
         }
 
         public void UpdateRoute(IEnumerable<RoutePoint> points)
@@ -41,7 +36,7 @@ namespace nl.siwoc.RouteManager
                 var start = pointList[i].Position;
                 var end = pointList[i + 1].Position;
                 
-                MapRoute mapRoute = rp.GetRoute(start, end, false, false, (int)mapControl.Zoom);
+                MapRoute mapRoute = Settings.GetRoutingProvider().GetRoute(start, end, false, false, (int)mapControl.Zoom);
                 if (mapRoute != null)
                 {
                     allPoints.AddRange(mapRoute.Points);

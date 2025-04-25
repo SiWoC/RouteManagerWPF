@@ -3,7 +3,7 @@ using GMap.NET;
 using System.Windows.Input;
 using System.Windows.Controls;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public partial class MainWindow : Window
     {

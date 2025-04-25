@@ -1,9 +1,9 @@
-<Window x:Class="nl.siwoc.RouteManager.MainWindow"
+<Window x:Class="nl.siwoc.RouteManager.ui.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:nl.siwoc.RouteManager"
+        xmlns:local="clr-namespace:nl.siwoc.RouteManager.ui"
         mc:Ignorable="d"
         Title="Route Manager" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen">
@@ -47,7 +47,7 @@
             <StatusBarItem HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal" >
                     <Button Command="{Binding FitToRouteCommand}" Background="Transparent" BorderThickness="0" Padding="0">
-                        <Image Source="zoom-fit.1024x1024.png" Height="32" Width="32"/>
+                        <Image Source="resources/nl/siwoc/RouteManager/ui/zoom-fit.1024x1024.png" Height="32" Width="32"/>
                     </Button>
                     <TextBlock Text="{Binding ElementName=mapControl, Path=Zoom, StringFormat='Zoom [{0}]:'}" VerticalAlignment="Center"/>
                     <Slider Width="200" 

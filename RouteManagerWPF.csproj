@@ -12,7 +12,7 @@
     <Product>Route Manager</Product>
     <Description>A WPF application for managing routes using GMap.NET</Description>
     <Copyright>Copyright © 2025</Copyright>
-    <ApplicationIcon>src\ui\app.ico</ApplicationIcon>
+    <ApplicationIcon>resources\nl\siwoc\RouteManager\ui\app.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -21,7 +21,8 @@
   <ItemGroup>
     <None Remove="src\ui\zoom-fit.1024x1024.png" />
     <None Remove="src\ui\AppIcon.xaml" />
-    <None Remove="src\ui\app.ico" />
+    <None Remove="resources\nl\siwoc\RouteManager\ui\app.ico" />
+    <None Remove="resources\nl\siwoc\RouteManager\ui\zoom-fit.1024x1024.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="src\ui\zoom-fit.1024x1024.png">
+    <Resource Include="resources\nl\siwoc\RouteManager\ui\app.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="src\ui\app.ico">
+    <Resource Include="resources\nl\siwoc\RouteManager\ui\zoom-fit.1024x1024.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

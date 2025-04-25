@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {

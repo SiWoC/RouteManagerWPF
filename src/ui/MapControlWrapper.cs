@@ -2,10 +2,8 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsPresentation;
 using System.Windows.Input;
-using System.Windows.Controls;
-using System.Windows;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public class MapControlWrapper : GMapControl
     {

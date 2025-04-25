@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,22 +6,18 @@ using System.Windows.Input;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using CommunityToolkit.Mvvm.Input;
-using GMap.NET.WindowsPresentation;
-using System.Reflection;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 using System.Windows.Controls;
-using System.Linq;
 using System.Collections.Specialized;
+using System.Linq;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         private string statusMessage = "Ready";
         private ObservableCollection<RoutePoint> routePoints = new ObservableCollection<RoutePoint>();
         private PointLatLng center;
-        private GMapProvider mapProvider = OpenStreetMapProvider.Instance;
+        private GMapProvider mapProvider;
         private readonly MapControlWrapper mapControl;
         private RoutePoint selectedPoint;
         private RoutePoint draggedItem;
@@ -134,8 +129,6 @@ namespace nl.siwoc.RouteManager
             this.mapControl.ShowCenter = false;
             center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
 
-            // Initialize route polyline
-            routePolyline = new RoutePolyline(mapControl);
             routePoints.CollectionChanged += RoutePoints_CollectionChanged;
 
             // Initialize commands
@@ -155,11 +148,9 @@ namespace nl.siwoc.RouteManager
             }
 
             // Load saved provider
-            var savedProvider = Settings.LoadMapProvider();
-            if (savedProvider != null)
-            {
-                MapProvider = savedProvider;
-            }
+            MapProvider = Settings.LoadMapProvider();
+            // Initialize route polyline after provider is set
+            routePolyline = new RoutePolyline(mapControl);
         }
 
         private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -213,12 +204,8 @@ namespace nl.siwoc.RouteManager
 
         private PointLatLng? GetNearestPointOnRoad(PointLatLng point)
         {
-            // Get the routing provider (OpenStreetMap in this case)
-            var routingProvider = GMapProviders.OpenStreetMap as RoutingProvider;
-            if (routingProvider == null) return null;
-
             // Get a route that passes through our point
-            var route = routingProvider.GetRoute(
+            var route = Settings.GetRoutingProvider().GetRoute(
                 point,
                 point,
                 false, false, (int)mapControl.Zoom);
@@ -227,11 +214,11 @@ namespace nl.siwoc.RouteManager
 
             // Find the nearest point on the route
             var nearestPoint = route.Points
-                .OrderBy(p => GMap.NET.MapProviders.OpenStreetMapProvider.Instance.Projection.GetDistance(p, point))
+                .OrderBy(p => mapProvider.Projection.GetDistance(p, point))
                 .First();
 
             // Check if the nearest point is within the configured distance
-            var distance = GMap.NET.MapProviders.OpenStreetMapProvider.Instance.Projection.GetDistance(nearestPoint, point);
+            var distance = mapProvider.Projection.GetDistance(nearestPoint, point);
             if (distance > Settings.LoadRoadSnapDistance() / 1000.0) // Convert meters to kilometers
             {
                 return null;

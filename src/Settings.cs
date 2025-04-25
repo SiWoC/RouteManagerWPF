@@ -1,6 +1,7 @@
-using System;
 using Microsoft.Win32;
 using GMap.NET.MapProviders;
+using nl.siwoc.RouteManager.ui;
+using GMap.NET;
 
 namespace nl.siwoc.RouteManager
 {
@@ -12,6 +13,13 @@ namespace nl.siwoc.RouteManager
         private const string StartLongitudeKey = "StartLongitude";
         private const string RoadSnapDistanceKey = "RoadSnapDistance";
         private const int DefaultRoadSnapDistance = 500; // meters
+        private static readonly GMapProvider DefaultMapProvider = OpenStreetMapProvider.Instance;
+        private static readonly RoutingProvider DefaultRoutingProvider = OpenStreetMapProvider.Instance as RoutingProvider;
+
+        public static RoutingProvider GetRoutingProvider()
+        {
+            return DefaultRoutingProvider;
+        }
 
         public static void SaveMapProvider(GMapProvider provider)
         {
@@ -60,7 +68,7 @@ namespace nl.siwoc.RouteManager
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to load map provider: {ex.Message}");
             }
-            return null;
+            return DefaultMapProvider;
         }
 
         public static void SaveStartLatitude(double latitude)

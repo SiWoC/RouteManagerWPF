@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public partial class SettingsWindow : Window
     {

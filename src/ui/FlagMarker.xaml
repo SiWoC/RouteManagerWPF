@@ -1,7 +1,7 @@
 ﻿<UserControl
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Class="nl.siwoc.RouteManager.FlagMarker"
+    x:Class="nl.siwoc.RouteManager.ui.FlagMarker"
     Height="50" Width="45" Opacity="10">
     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
         <Canvas Name="Flag" Width="85.483819" Height="94.561432">

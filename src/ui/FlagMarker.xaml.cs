@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using GMap.NET.WindowsPresentation;
 
-namespace nl.siwoc.RouteManager
+namespace nl.siwoc.RouteManager.ui
 {
     public partial class FlagMarker
     {

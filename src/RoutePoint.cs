@@ -1,10 +1,8 @@
 using GMap.NET;
 using GMap.NET.WindowsPresentation;
-using System.Windows.Media;
+using nl.siwoc.RouteManager.ui;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Transactions;
-using System.Windows.Shapes;
 
 namespace nl.siwoc.RouteManager
 {
