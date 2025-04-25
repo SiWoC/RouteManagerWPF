@@ -1,0 +1,25 @@
+Data Version=6.0.0.27
+Start Trip=/storage/emulated/0/Android/data/com.alk.copilot.mapviewer/files/EU/save/Test copilot 10.trp
+Creator=ITN Converter 1.94 (http://www.benichou-software.com)
+TollClosed=0
+End Trip
+Start Stop=Stop 0
+Longitude=4668902
+Latitude=52145097
+City=GPS-plaatsbepaling
+End Stop
+Start Stop=Stop 1
+Longitude=4679874
+Latitude=52144221
+City=Lupinesingel 55
+End Stop
+Start Stop=Stop 2
+Longitude=4671570
+Latitude=52137550
+City=Politie Alphen Kees Mustersstraat
+End Stop
+Start Stop=Stop 3
+Longitude=4662529
+Latitude=52148339
+City=Concertweg 44
+End Stop

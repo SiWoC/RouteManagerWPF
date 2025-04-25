@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteManagerWPF", "RouteManagerWPF.csproj", "{A76EDCB0-922A-CCB9-0FF3-A67DFE0A3254}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteManagerWPF", "RouteManagerWPF\RouteManagerWPF.csproj", "{A76EDCB0-922A-CCB9-0FF3-A67DFE0A3254}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteManagerWPF.Tests", "RouteManagerWPF.Tests\RouteManagerWPF.Tests.csproj", "{F245A421-3753-4FF3-A5AD-32E4411BD596}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{A76EDCB0-922A-CCB9-0FF3-A67DFE0A3254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A76EDCB0-922A-CCB9-0FF3-A67DFE0A3254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A76EDCB0-922A-CCB9-0FF3-A67DFE0A3254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F245A421-3753-4FF3-A5AD-32E4411BD596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F245A421-3753-4FF3-A5AD-32E4411BD596}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F245A421-3753-4FF3-A5AD-32E4411BD596}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F245A421-3753-4FF3-A5AD-32E4411BD596}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

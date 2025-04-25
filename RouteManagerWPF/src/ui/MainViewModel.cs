@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Windows.Controls;
 using System.Collections.Specialized;
 using System.Linq;
+using nl.siwoc.RouteManager.fileFormats;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -160,15 +161,46 @@ namespace nl.siwoc.RouteManager.ui
 
         private void ExecuteNewRoute()
         {
+            mapControl.Markers.Clear();
             RoutePoints.Clear();
-            routePolyline.Clear();
+            routePolyline.Clear(); // will not be cleared automatically by recreation as with OpenRoute
             StatusMessage = "New route created";
         }
 
         private void ExecuteOpenRoute()
         {
-            // TODO: Implement open route functionality
-            StatusMessage = "Opening route...";
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "CoPilot TRP files|*.trp|All files|*.*",
+                DefaultExt = ".trp"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var parser = new CoPilotTrpFileParser();
+                    var points = parser.Read(dialog.FileName);
+                    
+                    // Clear all markers and points
+                    mapControl.Markers.Clear();
+                    RoutePoints.Clear();
+                    
+                    // Add new points to existing collection
+                    foreach (var point in points)
+                    {
+                        point.MapControl = mapControl;
+                        RoutePoints.Add(point);
+                    }
+                    ExecuteFitToRoute();
+                    
+                    StatusMessage = "Route loaded successfully";
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Error loading route: {ex.Message}";
+                }
+            }
         }
 
         private void ExecuteSaveRoute()
@@ -239,23 +271,16 @@ namespace nl.siwoc.RouteManager.ui
                 StatusMessage = "Point on road added from map";
             }
 
-            var newPoint = new RoutePoint(
-                mapControl,
-                RoutePoints.Count + 1,
-                nearestRoadPoint.Value
-            );
-
-            // Add both to collections
+            var newPoint = new RoutePoint(RoutePoints.Count + 1, nearestRoadPoint.Value);
+            newPoint.MapControl = mapControl;
             RoutePoints.Add(newPoint);
-            mapControl.Markers.Add(newPoint.Marker);
-            
         }
 
         private void ExecuteDeletePoint()
         {
             if (SelectedPoint != null)
             {
-                mapControl.Markers.Remove(SelectedPoint.Marker);
+                SelectedPoint.MapControl = null;  // This will remove the marker
                 RoutePoints.Remove(SelectedPoint);
                 StatusMessage = "Point deleted";
                 UpdateRoutePointIndices();
