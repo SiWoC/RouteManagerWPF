@@ -237,7 +237,7 @@ namespace nl.siwoc.RouteManager.ui
         private PointLatLng? GetNearestPointOnRoad(PointLatLng point)
         {
             // Get a route that passes through our point
-            var route = Settings.GetRoutingProvider().GetRoute(
+            var route = Settings.LoadRoutingProvider().GetRoute(
                 point,
                 point,
                 false, false, (int)mapControl.Zoom);
@@ -272,8 +272,40 @@ namespace nl.siwoc.RouteManager.ui
             }
 
             var newPoint = new RoutePoint(RoutePoints.Count + 1, nearestRoadPoint.Value);
+            EnrichRoutePoint(newPoint);
             newPoint.MapControl = mapControl;
             RoutePoints.Add(newPoint);
+        }
+
+        private void EnrichRoutePoint(RoutePoint routePoint)
+        {
+            Placemark? p = GetPlacemark(routePoint.Position);
+            if (p != null)
+            {
+                routePoint.Country = p.Value.CountryName;
+                routePoint.City = p.Value.LocalityName ?? p.Value.DistrictName ?? p.Value.SubAdministrativeAreaName;
+                routePoint.Zip = p.Value.PostalCodeNumber;
+                routePoint.Address = string.Join(" ", new[] { p.Value.ThoroughfareName, p.Value.StreetNumber }.Where(s => !string.IsNullOrEmpty(s)));
+            }
+        }
+
+        private Placemark? GetPlacemark(PointLatLng point)
+        {
+            GeoCoderStatusCode status;
+            Placemark? plret;
+            if (!string.IsNullOrEmpty(Settings.LoadGoogleApiKey()))
+            {
+                plret = GMapProviders.GoogleMap.GetPlacemark(point, out status);
+            }
+            else
+            {
+                plret = GMapProviders.OpenStreetMap.GetPlacemark(point, out status);
+            }
+            if (status == GeoCoderStatusCode.OK && plret != null)
+            {
+                return plret;
+            }
+            return null;
         }
 
         private void ExecuteDeletePoint()
@@ -295,8 +327,6 @@ namespace nl.siwoc.RouteManager.ui
             };
             if (settingsWindow.ShowDialog() == true)
             {
-                // Update center if settings were saved
-                Center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
                 StatusMessage = "Settings saved";
             }
         }

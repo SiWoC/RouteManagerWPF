@@ -25,12 +25,12 @@ namespace nl.siwoc.RouteManager.ui
                 FlagCloth.Fill = Brushes.Green;
             }
 
+            // Set the marker offset to position the flag above its point
+            _marker.Offset = new Point(0, -Height);
+
             _popup = new Popup();
             _label = new Label();
 
-            Unloaded += FlagMarker_Unloaded;
-            Loaded += FlagMarker_Loaded;
-            SizeChanged += FlagMarker_SizeChanged;
             MouseEnter += MarkerControl_MouseEnter;
             MouseLeave += MarkerControl_MouseLeave;
             MouseMove += FlagMarker_MouseMove;
@@ -48,38 +48,6 @@ namespace nl.siwoc.RouteManager.ui
                 _label.Content = title;
             }
             _popup.Child = _label;
-        }
-
-        void FlagMarker_Loaded(object sender, RoutedEventArgs e)
-        {
-            /*
-            if (Icon.Source.CanFreeze)
-            {
-                Icon.Source.Freeze();
-            }
-            */
-        }
-
-        void FlagMarker_Unloaded(object sender, RoutedEventArgs e)
-        {
-            Unloaded -= FlagMarker_Unloaded;
-            Loaded -= FlagMarker_Loaded;
-            SizeChanged -= FlagMarker_SizeChanged;
-            MouseEnter -= MarkerControl_MouseEnter;
-            MouseLeave -= MarkerControl_MouseLeave;
-            MouseMove -= FlagMarker_MouseMove;
-            MouseLeftButtonUp -= FlagMarker_MouseLeftButtonUp;
-            MouseLeftButtonDown -= FlagMarker_MouseLeftButtonDown;
-
-            _marker.Shape = null;
-            Flag = null;
-            _popup = null;
-            _label = null;
-        }
-
-        void FlagMarker_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            _marker.Offset = new Point(0, -e.NewSize.Height);
         }
 
         void FlagMarker_MouseMove(object sender, MouseEventArgs e)

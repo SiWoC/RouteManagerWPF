@@ -36,7 +36,7 @@ namespace nl.siwoc.RouteManager.ui
                 var start = pointList[i].Position;
                 var end = pointList[i + 1].Position;
                 
-                MapRoute mapRoute = Settings.GetRoutingProvider().GetRoute(start, end, false, false, (int)mapControl.Zoom);
+                MapRoute mapRoute = Settings.LoadRoutingProvider().GetRoute(start, end, false, false, (int)mapControl.Zoom);
                 if (mapRoute != null)
                 {
                     allPoints.AddRange(mapRoute.Points);

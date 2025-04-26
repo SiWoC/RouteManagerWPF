@@ -12,13 +12,64 @@ namespace nl.siwoc.RouteManager
         private const string StartLatitudeKey = "StartLatitude";
         private const string StartLongitudeKey = "StartLongitude";
         private const string RoadSnapDistanceKey = "RoadSnapDistance";
+        private const string GoogleApiKeyKey = "GoogleApiKey";
+        private const string RoutingProviderKey = "RoutingProvider";
         private const int DefaultRoadSnapDistance = 500; // meters
         private static readonly GMapProvider DefaultMapProvider = OpenStreetMapProvider.Instance;
         private static readonly RoutingProvider DefaultRoutingProvider = OpenStreetMapProvider.Instance as RoutingProvider;
 
-        public static RoutingProvider GetRoutingProvider()
+        public static string LoadRoutingProviderName()
         {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(RegistryPath))
+                {
+                    if (key?.GetValue(RoutingProviderKey) is string providerName)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Loaded routing provider name from registry: {providerName}");
+                        return providerName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load routing provider name: {ex.Message}");
+            }
+            return "OpenStreetMap";
+        }
+
+        public static RoutingProvider LoadRoutingProvider()
+        {
+            var providerName = LoadRoutingProviderName();
+            if (providerName == "GoogleMapProvider")
+            {
+                var apiKey = LoadGoogleApiKey();
+                if (!string.IsNullOrEmpty(apiKey))
+                {
+                    var provider = GoogleMapProvider.Instance as RoutingProvider;
+                    if (provider != null)
+                    {
+                        return provider;
+                    }
+                }
+            }
             return DefaultRoutingProvider;
+        }
+
+        public static void SaveRoutingProvider(string providerName)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.CreateSubKey(RegistryPath))
+                {
+                    key?.SetValue(RoutingProviderKey, providerName);
+                    System.Diagnostics.Debug.WriteLine($"Saved routing provider to registry: {providerName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to save routing provider: {ex.Message}");
+            }
         }
 
         public static void SaveMapProvider(GMapProvider provider)
@@ -114,6 +165,32 @@ namespace nl.siwoc.RouteManager
         {
             var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
             key.SetValue(RoadSnapDistanceKey, distance.ToString());
+        }
+
+        public static void SaveGoogleApiKey(string apiKey)
+        {
+            var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
+            key.SetValue(GoogleApiKeyKey, apiKey);
+            
+            // Set the API key for all Google providers
+            GoogleMapProvider.Instance.ApiKey = apiKey;
+            GoogleSatelliteMapProvider.Instance.ApiKey = apiKey;
+            GoogleHybridMapProvider.Instance.ApiKey = apiKey;
+            GoogleTerrainMapProvider.Instance.ApiKey = apiKey;
+        }
+
+        public static string LoadGoogleApiKey()
+        {
+            var key = Registry.CurrentUser.OpenSubKey(RegistryPath);
+            var apiKey = key?.GetValue(GoogleApiKeyKey)?.ToString() ?? string.Empty;
+            
+            // Set the API key for all Google providers
+            GoogleMapProvider.Instance.ApiKey = apiKey;
+            GoogleSatelliteMapProvider.Instance.ApiKey = apiKey;
+            GoogleHybridMapProvider.Instance.ApiKey = apiKey;
+            GoogleTerrainMapProvider.Instance.ApiKey = apiKey;
+            
+            return apiKey;
         }
     }
 } 

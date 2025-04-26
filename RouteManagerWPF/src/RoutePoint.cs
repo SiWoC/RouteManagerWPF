@@ -112,6 +112,10 @@ namespace nl.siwoc.RouteManager
                 if (address != value)
                 {
                     address = value;
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = address;
+                    }
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(DisplayText));
                 }
@@ -172,7 +176,6 @@ namespace nl.siwoc.RouteManager
         {
             this.position = position;
             Index = index;
-            Name = $"Point {Index}";
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

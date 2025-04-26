@@ -48,7 +48,10 @@ namespace nl.siwoc.RouteManager.ui
                 GoogleMapProvider.Instance,
                 GoogleSatelliteMapProvider.Instance,
                 GoogleHybridMapProvider.Instance,
-                GoogleTerrainMapProvider.Instance
+                GoogleTerrainMapProvider.Instance,
+                NearMapProvider.Instance,
+                NearSatelliteMapProvider.Instance,
+                NearHybridMapProvider.Instance
             };
         }
     }

@@ -72,7 +72,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Map Provider Selection -->
-            <GroupBox Grid.Column="0" Height="55" Width="140" Header="Map Provider" Panel.ZIndex="5" 
+            <GroupBox Grid.Column="0" Height="55" Width="160" Header="Map Provider" Panel.ZIndex="5" 
                      HorizontalAlignment="Left" VerticalAlignment="Top">
                 <ComboBox x:Name="MapProviderComboBox"
                              ItemsSource="{Binding MapProviders}"
