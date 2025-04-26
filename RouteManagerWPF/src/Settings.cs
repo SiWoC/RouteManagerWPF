@@ -18,8 +18,20 @@ namespace nl.siwoc.RouteManager
         private static readonly GMapProvider DefaultMapProvider = OpenStreetMapProvider.Instance;
         private static readonly RoutingProvider DefaultRoutingProvider = OpenStreetMapProvider.Instance as RoutingProvider;
 
+        // Cache for settings
+        private static string cachedRoutingProviderName;
+        private static GMapProvider cachedMapProvider;
+        private static double? cachedStartLatitude;
+        private static double? cachedStartLongitude;
+        private static int? cachedRoadSnapDistance;
+        private static string cachedGoogleApiKey;
+        private static RoutingProvider cachedRoutingProvider;
+
         public static string LoadRoutingProviderName()
         {
+            if (cachedRoutingProviderName != null)
+                return cachedRoutingProviderName;
+
             try
             {
                 using (var key = Registry.CurrentUser.OpenSubKey(RegistryPath))
@@ -27,6 +39,7 @@ namespace nl.siwoc.RouteManager
                     if (key?.GetValue(RoutingProviderKey) is string providerName)
                     {
                         System.Diagnostics.Debug.WriteLine($"Loaded routing provider name from registry: {providerName}");
+                        cachedRoutingProviderName = providerName;
                         return providerName;
                     }
                 }
@@ -35,11 +48,15 @@ namespace nl.siwoc.RouteManager
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to load routing provider name: {ex.Message}");
             }
-            return "OpenStreetMap";
+            cachedRoutingProviderName = "OpenStreetMap";
+            return cachedRoutingProviderName;
         }
 
         public static RoutingProvider LoadRoutingProvider()
         {
+            if (cachedRoutingProvider != null)
+                return cachedRoutingProvider;
+
             var providerName = LoadRoutingProviderName();
             if (providerName == "GoogleMapProvider")
             {
@@ -49,10 +66,12 @@ namespace nl.siwoc.RouteManager
                     var provider = GoogleMapProvider.Instance as RoutingProvider;
                     if (provider != null)
                     {
+                        cachedRoutingProvider = provider;
                         return provider;
                     }
                 }
             }
+            cachedRoutingProvider = DefaultRoutingProvider;
             return DefaultRoutingProvider;
         }
 
@@ -64,6 +83,8 @@ namespace nl.siwoc.RouteManager
                 {
                     key?.SetValue(RoutingProviderKey, providerName);
                     System.Diagnostics.Debug.WriteLine($"Saved routing provider to registry: {providerName}");
+                    cachedRoutingProviderName = providerName;
+                    cachedRoutingProvider = null; // Invalidate cache
                 }
             }
             catch (Exception ex)
@@ -81,6 +102,7 @@ namespace nl.siwoc.RouteManager
                     var providerName = provider?.Name ?? string.Empty;
                     key?.SetValue(MapProviderKey, providerName);
                     System.Diagnostics.Debug.WriteLine($"Saved provider to registry: {providerName}");
+                    cachedMapProvider = provider;
                 }
             }
             catch (Exception ex)
@@ -91,6 +113,9 @@ namespace nl.siwoc.RouteManager
 
         public static GMapProvider LoadMapProvider()
         {
+            if (cachedMapProvider != null)
+                return cachedMapProvider;
+
             try
             {
                 using (var key = Registry.CurrentUser.OpenSubKey(RegistryPath))
@@ -102,6 +127,7 @@ namespace nl.siwoc.RouteManager
                         if (provider != null)
                         {
                             System.Diagnostics.Debug.WriteLine($"Loaded provider from registry: {provider.Name}");
+                            cachedMapProvider = provider;
                             return provider;
                         }
                         else
@@ -119,6 +145,7 @@ namespace nl.siwoc.RouteManager
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to load map provider: {ex.Message}");
             }
+            cachedMapProvider = DefaultMapProvider;
             return DefaultMapProvider;
         }
 
@@ -126,51 +153,70 @@ namespace nl.siwoc.RouteManager
         {
             var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
             key.SetValue(StartLatitudeKey, latitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            cachedStartLatitude = latitude;
         }
 
         public static void SaveStartLongitude(double longitude)
         {
             var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
             key.SetValue(StartLongitudeKey, longitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            cachedStartLongitude = longitude;
         }
 
         public static double LoadStartLatitude()
         {
+            if (cachedStartLatitude.HasValue)
+                return cachedStartLatitude.Value;
+
             var key = Registry.CurrentUser.OpenSubKey(RegistryPath);
             var value = key?.GetValue(StartLatitudeKey)?.ToString();
-            return value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result) 
-                ? result 
+            var result = value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed) 
+                ? parsed 
                 : 46.538615; // Default latitude
+            cachedStartLatitude = result;
+            return result;
         }
 
         public static double LoadStartLongitude()
         {
+            if (cachedStartLongitude.HasValue)
+                return cachedStartLongitude.Value;
+
             var key = Registry.CurrentUser.OpenSubKey(RegistryPath);
             var value = key?.GetValue(StartLongitudeKey)?.ToString();
-            return value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result) 
-                ? result 
+            var result = value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed) 
+                ? parsed 
                 : 10.501385; // Default longitude
+            cachedStartLongitude = result;
+            return result;
         }
 
         public static int LoadRoadSnapDistance()
         {
+            if (cachedRoadSnapDistance.HasValue)
+                return cachedRoadSnapDistance.Value;
+
             var key = Registry.CurrentUser.OpenSubKey(RegistryPath);
             var value = key?.GetValue(RoadSnapDistanceKey)?.ToString();
-            return value != null && int.TryParse(value, out int result) 
-                ? result 
+            var result = value != null && int.TryParse(value, out int parsed) 
+                ? parsed 
                 : DefaultRoadSnapDistance;
+            cachedRoadSnapDistance = result;
+            return result;
         }
 
         public static void SaveRoadSnapDistance(int distance)
         {
             var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
             key.SetValue(RoadSnapDistanceKey, distance.ToString());
+            cachedRoadSnapDistance = distance;
         }
 
         public static void SaveGoogleApiKey(string apiKey)
         {
             var key = Registry.CurrentUser.CreateSubKey(RegistryPath);
             key.SetValue(GoogleApiKeyKey, apiKey);
+            cachedGoogleApiKey = apiKey;
             
             // Set the API key for all Google providers
             GoogleMapProvider.Instance.ApiKey = apiKey;
@@ -181,8 +227,12 @@ namespace nl.siwoc.RouteManager
 
         public static string LoadGoogleApiKey()
         {
+            if (cachedGoogleApiKey != null)
+                return cachedGoogleApiKey;
+
             var key = Registry.CurrentUser.OpenSubKey(RegistryPath);
             var apiKey = key?.GetValue(GoogleApiKeyKey)?.ToString() ?? string.Empty;
+            cachedGoogleApiKey = apiKey;
             
             // Set the API key for all Google providers
             GoogleMapProvider.Instance.ApiKey = apiKey;

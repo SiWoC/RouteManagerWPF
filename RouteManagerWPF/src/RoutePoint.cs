@@ -3,6 +3,8 @@ using GMap.NET.WindowsPresentation;
 using nl.siwoc.RouteManager.ui;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace nl.siwoc.RouteManager
 {
@@ -21,6 +23,22 @@ namespace nl.siwoc.RouteManager
         public GMapMarker Marker { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public ICommand ClickCommand 
+        { 
+            set
+            {
+                if (Marker?.Shape is FlagMarker flagMarker)
+                {
+                    flagMarker.ClickCommand = value;
+                }
+            }
+        }
+
+        public RoutePoint(int index, PointLatLng position)
+        {
+            this.position = position;
+            Index = index;
+        }
 
         public MapControlWrapper MapControl
         {
@@ -41,7 +59,9 @@ namespace nl.siwoc.RouteManager
                     if (mapControl != null)
                     {
                         Marker = new GMapMarker(Position);
-                        Marker.Shape = new FlagMarker(mapControl, Marker, Name, Index);
+                        var flagMarker = new FlagMarker(mapControl, Marker, Name, Index);
+                        Marker.Shape = flagMarker;
+                        Marker.ZIndex = 100;
                         mapControl.Markers.Add(Marker);
                     }
                 }
@@ -111,11 +131,12 @@ namespace nl.siwoc.RouteManager
             {
                 if (address != value)
                 {
-                    address = value;
-                    if (string.IsNullOrEmpty(name))
+                    if (string.IsNullOrEmpty(name) || string.Equals(name, address))
                     {
-                        name = address;
+                        name = value;
+                        OnPropertyChanged(nameof(Name));
                     }
+                    address = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(DisplayText));
                 }
@@ -146,9 +167,9 @@ namespace nl.siwoc.RouteManager
                 if (index != value)
                 {
                     index = value;
-                    if (Marker != null)
+                    if (Marker?.Shape is FlagMarker flagMarker)
                     {
-                        (Marker.Shape as FlagMarker).FlagText.Text = value.ToString();
+                        flagMarker.Index = value;
                     }
                     OnPropertyChanged();
                 }
@@ -170,12 +191,6 @@ namespace nl.siwoc.RouteManager
                     OnPropertyChanged();
                 }
             }
-        }
-
-        public RoutePoint(int index, PointLatLng position)
-        {
-            this.position = position;
-            Index = index;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

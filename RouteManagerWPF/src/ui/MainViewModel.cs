@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Collections.Specialized;
 using System.Linq;
 using nl.siwoc.RouteManager.fileFormats;
+using System.Windows.Threading;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -23,6 +24,8 @@ namespace nl.siwoc.RouteManager.ui
         private RoutePoint selectedPoint;
         private RoutePoint draggedItem;
         private readonly RoutePolyline routePolyline;
+        private readonly DispatcherTimer updateRouteTimer;
+        private bool routeUpdatePending;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -120,9 +123,7 @@ namespace nl.siwoc.RouteManager.ui
         public ICommand AddPointAtLocationCommand { get; }
         public ICommand DeletePointCommand { get; }
         public ICommand SettingsCommand { get; }
-        public ICommand DragStartCommand { get; }
-        public ICommand DropCommand { get; }
-        public ICommand DragOverCommand { get; }
+
 
         public MainViewModel(MapControlWrapper mapControl)
         {
@@ -131,6 +132,17 @@ namespace nl.siwoc.RouteManager.ui
             center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
 
             routePoints.CollectionChanged += RoutePoints_CollectionChanged;
+
+            // Initialize debounce timer
+            updateRouteTimer = new DispatcherTimer();
+            updateRouteTimer.Interval = TimeSpan.FromMilliseconds(500);
+            updateRouteTimer.Tick += (s, e) => {
+                if (routeUpdatePending)
+                {
+                    routeUpdatePending = false;
+                    routePolyline.UpdateRoute(RoutePoints);
+                }
+            };
 
             // Initialize commands
             NewRouteCommand = new RelayCommand(ExecuteNewRoute);
@@ -154,9 +166,40 @@ namespace nl.siwoc.RouteManager.ui
             routePolyline = new RoutePolyline(mapControl);
         }
 
+        private void ScheduleRouteUpdate()
+        {
+            routeUpdatePending = true;
+            updateRouteTimer.Stop();
+            updateRouteTimer.Start();
+        }
+
         private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            routePolyline.UpdateRoute(RoutePoints);
+            ScheduleRouteUpdate();
+
+            if (e.NewItems != null)
+            {
+                foreach (RoutePoint point in e.NewItems)
+                {
+                    if (point.MapControl != null)
+                    {
+                        var flagMarker = (FlagMarker)point.Marker.Shape;
+                        flagMarker.ClickCommand = new RelayCommand(() => SelectedPoint = point);
+                        flagMarker.PositionChangedCommand = new RelayCommand<PointLatLng>(newPos => {
+                            if (point.Position != newPos)
+                            {
+                                point.Position = newPos;
+                                ScheduleRouteUpdate();
+                            }
+                        });
+                        flagMarker.DropCommand = new RelayCommand<PointLatLng>(newPos => {
+                            point.Position = GetNearestPointOnRoad(newPos);
+                            EnrichRoutePoint(point);
+                            ScheduleRouteUpdate();
+                        });
+                    }
+                }
+            }
         }
 
         private void ExecuteNewRoute()
@@ -234,7 +277,7 @@ namespace nl.siwoc.RouteManager.ui
             StatusMessage = "Fitting view to route...";
         }
 
-        private PointLatLng? GetNearestPointOnRoad(PointLatLng point)
+        private PointLatLng GetNearestPointOnRoad(PointLatLng point)
         {
             // Get a route that passes through our point
             var route = Settings.LoadRoutingProvider().GetRoute(
@@ -242,7 +285,7 @@ namespace nl.siwoc.RouteManager.ui
                 point,
                 false, false, (int)mapControl.Zoom);
 
-            if (route == null || route.Points.Count == 0) return null;
+            if (route == null || route.Points.Count == 0) return point;
 
             // Find the nearest point on the route
             var nearestPoint = route.Points
@@ -253,25 +296,19 @@ namespace nl.siwoc.RouteManager.ui
             var distance = mapProvider.Projection.GetDistance(nearestPoint, point);
             if (distance > Settings.LoadRoadSnapDistance() / 1000.0) // Convert meters to kilometers
             {
-                return null;
+                StatusMessage = "No road found at clicked point";
+                return point;
             }
-
-            return nearestPoint;
+            else
+            {
+                StatusMessage = "Point on road added from map";
+                return nearestPoint;
+            }
         }
 
         private void ExecuteAddPointAtLocation()
         {
-            var clickedPoint = mapControl.LastRightClickPosition;
-            var nearestRoadPoint = GetNearestPointOnRoad(clickedPoint);
-            if (nearestRoadPoint == null)
-            {
-                StatusMessage = "No road found at clicked point";
-                nearestRoadPoint = clickedPoint;
-            } else {
-                StatusMessage = "Point on road added from map";
-            }
-
-            var newPoint = new RoutePoint(RoutePoints.Count + 1, nearestRoadPoint.Value);
+            var newPoint = new RoutePoint(RoutePoints.Count + 1, GetNearestPointOnRoad(mapControl.LastRightClickPosition));
             EnrichRoutePoint(newPoint);
             newPoint.MapControl = mapControl;
             RoutePoints.Add(newPoint);
