@@ -187,6 +187,24 @@ namespace nl.siwoc.RouteManager.ui
             updateRouteTimer.Start();
         }
 
+        private void SetupFlagEvents(RoutePoint point)
+        {
+            var flagMarker = (FlagMarker)point.Marker.Shape;
+            flagMarker.ClickCommand = new RelayCommand(() => SelectedPoint = point);
+            flagMarker.PositionChangedCommand = new RelayCommand<PointLatLng>(newPos => {
+                if (point.Position != newPos)
+                {
+                    point.Position = newPos;
+                    ScheduleRouteUpdate();
+                }
+            });
+            flagMarker.DropCommand = new RelayCommand<PointLatLng>(newPos => {
+                point.Position = GetNearestPointOnRoad(newPos);
+                EnrichRoutePoint(point);
+                ScheduleRouteUpdate();
+            });
+        }
+
         private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             ScheduleRouteUpdate();
@@ -197,20 +215,7 @@ namespace nl.siwoc.RouteManager.ui
                 {
                     if (point.MapControl != null)
                     {
-                        var flagMarker = (FlagMarker)point.Marker.Shape;
-                        flagMarker.ClickCommand = new RelayCommand(() => SelectedPoint = point);
-                        flagMarker.PositionChangedCommand = new RelayCommand<PointLatLng>(newPos => {
-                            if (point.Position != newPos)
-                            {
-                                point.Position = newPos;
-                                ScheduleRouteUpdate();
-                            }
-                        });
-                        flagMarker.DropCommand = new RelayCommand<PointLatLng>(newPos => {
-                            point.Position = GetNearestPointOnRoad(newPos);
-                            EnrichRoutePoint(point);
-                            ScheduleRouteUpdate();
-                        });
+                        SetupFlagEvents(point);
                     }
                 }
             }
@@ -228,7 +233,7 @@ namespace nl.siwoc.RouteManager.ui
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "CoPilot TRP files|*.trp|All files|*.*",
+                Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
                 DefaultExt = ".trp"
             };
 
@@ -236,7 +241,18 @@ namespace nl.siwoc.RouteManager.ui
             {
                 try
                 {
-                    var parser = new CoPilotTrpFileParser();
+                    // Temporarily disable CollectionChanged events
+                    routePoints.CollectionChanged -= RoutePoints_CollectionChanged;
+
+                    IFileParser parser;
+                    if (dialog.FileName.EndsWith(".gpx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        parser = new GpxFileParser();
+                    }
+                    else
+                    {
+                        parser = new CoPilotTrpFileParser();
+                    }
                     var (points, routeName) = parser.Read(dialog.FileName);
                     
                     // Clear all markers and points
@@ -247,6 +263,7 @@ namespace nl.siwoc.RouteManager.ui
                     foreach (var point in points)
                     {
                         point.MapControl = mapControl;
+                        SetupFlagEvents(point);
                         RoutePoints.Add(point);
                     }
                     RouteName = routeName;
@@ -257,6 +274,13 @@ namespace nl.siwoc.RouteManager.ui
                 catch (Exception ex)
                 {
                     StatusMessage = $"Error loading route: {ex.Message}";
+                }
+                finally
+                {
+                    // Re-enable CollectionChanged events
+                    routePoints.CollectionChanged += RoutePoints_CollectionChanged;
+                    // Trigger one final update
+                    ScheduleRouteUpdate();
                 }
             }
         }
@@ -271,7 +295,7 @@ namespace nl.siwoc.RouteManager.ui
 
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
-                Filter = "CoPilot TRP files|*.trp|All files|*.*",
+                Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
                 DefaultExt = ".trp"
             };
 
@@ -279,7 +303,15 @@ namespace nl.siwoc.RouteManager.ui
             {
                 try
                 {
-                    var parser = new CoPilotTrpFileParser();
+                    IFileParser parser;
+                    if (dialog.FileName.EndsWith(".gpx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        parser = new GpxFileParser();
+                    }
+                    else
+                    {
+                        parser = new CoPilotTrpFileParser();
+                    }
                     parser.Write(dialog.FileName, RoutePoints.ToList(), RouteName);
                     StatusMessage = "Route saved successfully";
                 }

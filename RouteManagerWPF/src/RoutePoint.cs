@@ -158,7 +158,14 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public string DisplayText => string.Join(", ", new[] { Address, City }.Where(s => !string.IsNullOrEmpty(s)));
+        public string DisplayText
+        {
+            get
+            {
+                var addressText = string.Join(", ", new[] { Address, City }.Where(s => !string.IsNullOrEmpty(s)));
+                return !string.IsNullOrEmpty(addressText) ? addressText : Name;
+            }
+        }
 
         public int Index
         {

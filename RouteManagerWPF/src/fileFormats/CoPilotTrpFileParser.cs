@@ -11,7 +11,7 @@ namespace nl.siwoc.RouteManager.fileFormats
         public (List<RoutePoint> Points, string RouteName) Read(string filePath)
         {
             var points = new List<RoutePoint>();
-            var lines = File.ReadAllLines(filePath);
+            var lines = File.ReadAllLines(filePath, System.Text.Encoding.Unicode);
             var currentStop = new Dictionary<string, string>();
             string tripName = null;
 
@@ -59,11 +59,21 @@ namespace nl.siwoc.RouteManager.fileFormats
                 }
             }
 
+            if (points.Count == 0)
+            {
+                throw new Exception("No valid points found in TRP file");
+            }
+
             return (points, tripName);
         }
 
         public void Write(string filePath, List<RoutePoint> points, string routeName = null)
         {
+            if (points == null || points.Count == 0)
+            {
+                throw new ArgumentException("Cannot write empty points list", nameof(points));
+            }
+
             var lines = new List<string>
             {
                 "Data Version:3.4.1.2",
@@ -94,7 +104,7 @@ namespace nl.siwoc.RouteManager.fileFormats
                 lines.Add("");
             }
 
-            File.WriteAllLines(filePath, lines);
+            File.WriteAllLines(filePath, lines, System.Text.Encoding.Unicode);
         }
     }
 } 

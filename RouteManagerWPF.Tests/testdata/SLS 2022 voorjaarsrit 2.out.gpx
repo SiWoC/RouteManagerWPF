@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx version="1.1" creator="RouteManager (https://github.com/SiWoC/RouteManagerWPF)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>SLS 2022 voorjaarsrit 2</name>
+  </metadata>
+  <rte>
+    <name>SLS 2022 voorjaarsrit 2</name>
+    <rtept lat="48.505021" lon="7.2785">
+      <name>Russ, Grand Est, Frankrijk</name>
+    </rtept>
+    <rtept lat="48.062495" lon="7.01826">
+      <name>Col de la Schlucht 1139m</name>
+    </rtept>
+    <rtept lat="47.969468" lon="7.043044">
+      <name>Col du Platzerwasel</name>
+    </rtept>
+    <rtept lat="48.003871" lon="7.215734">
+      <name>Col du Petit Ballon geen route</name>
+    </rtept>
+    <rtept lat="47.905075" lon="7.103015">
+      <name>Col du Grand Ballon</name>
+    </rtept>
+    <rtept lat="47.718633" lon="6.941219">
+      <name>Anjoutey, Bourgogne-Franche-Comté, Frankrijk</name>
+    </rtept>
+    <rtept lat="47.820637" lon="6.834639">
+      <name>Col du Ballon d'Alsace</name>
+    </rtept>
+    <rtept lat="47.822644" lon="6.787768">
+      <name>Col du Ballon de Servance</name>
+    </rtept>
+    <rtept lat="47.776064" lon="6.780038">
+      <name>Col de la Planche des Belles Filles</name>
+    </rtept>
+    <rtept lat="47.763691" lon="6.732022">
+      <name>Plancher-les-Mines, Bourgogne-Franche-Comté, Frankrijk</name>
+    </rtept>
+    <rtept lat="47.92298" lon="6.916984">
+      <name>Col d'Oderen</name>
+    </rtept>
+    <rtept lat="48.00038" lon="6.94547">
+      <name>Col du Bramont</name>
+    </rtept>
+    <rtept lat="48.02652" lon="6.8851">
+      <name>Col de Grosse Pierre</name>
+    </rtept>
+  </rte>
+</gpx>
