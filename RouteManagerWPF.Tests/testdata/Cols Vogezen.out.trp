@@ -1,5 +1,5 @@
 Data Version:3.4.1.2
-Start Trip=Cols Vogezen
+Start Trip=Cols Vogezen 21
 End Trip
 
 Start Stop=Stop 0
@@ -8,7 +8,6 @@ Latitude=48505021
 State=Franche
 Zip=67130
 City=Russ
-County=
 Address=D1420
 Show=1
 End Stop

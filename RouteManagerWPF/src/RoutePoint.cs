@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Linq;
 
 namespace nl.siwoc.RouteManager
 {
@@ -157,7 +158,7 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public string DisplayText => $"{Name} ({Position.Lat:F5}, {Position.Lng:F5})";
+        public string DisplayText => string.Join(", ", new[] { Address, City }.Where(s => !string.IsNullOrEmpty(s)));
 
         public int Index
         {

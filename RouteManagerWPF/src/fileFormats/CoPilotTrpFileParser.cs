@@ -8,7 +8,7 @@ namespace nl.siwoc.RouteManager.fileFormats
 {
     public class CoPilotTrpFileParser : IFileParser
     {
-        public List<RoutePoint> Read(string filePath)
+        public (List<RoutePoint> Points, string RouteName) Read(string filePath)
         {
             var points = new List<RoutePoint>();
             var lines = File.ReadAllLines(filePath);
@@ -44,9 +44,9 @@ namespace nl.siwoc.RouteManager.fileFormats
                         if (currentStop.TryGetValue("Zip", out var zip))
                             point.Zip = zip;
                         if (currentStop.TryGetValue("Show", out var show))
-                            point.IsStop = show == "1";
+                            point.IsStop = (show == "1");
 
-                        point.Name = string.Join(", ", new[] { point.Address, point.City }.Where(s => !string.IsNullOrEmpty(s)));
+                        point.Name = point.Address;
 
                         points.Add(point);
                     }
@@ -59,16 +59,17 @@ namespace nl.siwoc.RouteManager.fileFormats
                 }
             }
 
-            return points;
+            return (points, tripName);
         }
 
-        public void Write(string filePath, List<RoutePoint> points)
+        public void Write(string filePath, List<RoutePoint> points, string routeName = null)
         {
             var lines = new List<string>
             {
                 "Data Version:3.4.1.2",
-                $"Start Trip={Path.GetFileNameWithoutExtension(filePath)}",
-                "End Trip"
+                $"Start Trip={routeName ?? Path.GetFileNameWithoutExtension(filePath)}",
+                "End Trip",
+                ""
             };
 
             for (int i = 0; i < points.Count; i++)
@@ -77,19 +78,20 @@ namespace nl.siwoc.RouteManager.fileFormats
                 lines.Add($"Start Stop=Stop {i}");
                 lines.Add($"Longitude={(int)(point.Position.Lng * 1000000)}");
                 lines.Add($"Latitude={(int)(point.Position.Lat * 1000000)}");
+                if (!string.IsNullOrEmpty(point.Country))
+                    lines.Add($"State={point.Country}");
+                if (!string.IsNullOrEmpty(point.Zip))
+                    lines.Add($"Zip={point.Zip}");
+                if (!string.IsNullOrEmpty(point.City))
+                    lines.Add($"City={point.City}");
                 // write name if available, otherwise write address
                 if (!string.IsNullOrEmpty(point.Name))
                     lines.Add($"Address={point.Name}");
                 else if (!string.IsNullOrEmpty(point.Address))
                     lines.Add($"Address={point.Address}");
-                if (!string.IsNullOrEmpty(point.City))
-                    lines.Add($"City={point.City}");
-                if (!string.IsNullOrEmpty(point.Country))
-                    lines.Add($"State={point.Country}");
-                if (!string.IsNullOrEmpty(point.Zip))
-                    lines.Add($"Zip={point.Zip}");
                 lines.Add($"Show={(point.IsStop ? "1" : "0")}");
                 lines.Add("End Stop");
+                lines.Add("");
             }
 
             File.WriteAllLines(filePath, lines);

@@ -115,6 +115,11 @@
                     <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
 
+                <!-- Route Name -->
+                <GroupBox Grid.Row="0" Header="Route Name">
+                    <TextBox Text="{Binding RouteName, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+                </GroupBox>
+
                 <!-- Point Details -->
                 <GroupBox Grid.Row="1" Header="Point Details" IsEnabled="{Binding SelectedPoint, Converter={StaticResource InstanceToBooleanConverter}}">
                     <Grid Margin="2">

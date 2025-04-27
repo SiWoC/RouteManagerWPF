@@ -26,6 +26,7 @@ namespace nl.siwoc.RouteManager.ui
         private readonly RoutePolyline routePolyline;
         private readonly DispatcherTimer updateRouteTimer;
         private bool routeUpdatePending;
+        private string routeName;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -110,6 +111,19 @@ namespace nl.siwoc.RouteManager.ui
                 if (selectedPoint != value)
                 {
                     selectedPoint = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string RouteName
+        {
+            get => routeName;
+            set
+            {
+                if (routeName != value)
+                {
+                    routeName = value;
                     OnPropertyChanged();
                 }
             }
@@ -223,7 +237,7 @@ namespace nl.siwoc.RouteManager.ui
                 try
                 {
                     var parser = new CoPilotTrpFileParser();
-                    var points = parser.Read(dialog.FileName);
+                    var (points, routeName) = parser.Read(dialog.FileName);
                     
                     // Clear all markers and points
                     mapControl.Markers.Clear();
@@ -235,6 +249,7 @@ namespace nl.siwoc.RouteManager.ui
                         point.MapControl = mapControl;
                         RoutePoints.Add(point);
                     }
+                    RouteName = routeName;
                     ExecuteFitToRoute();
                     
                     StatusMessage = "Route loaded successfully";
@@ -248,8 +263,31 @@ namespace nl.siwoc.RouteManager.ui
 
         private void ExecuteSaveRoute()
         {
-            // TODO: Implement save route functionality
-            StatusMessage = "Saving route...";
+            if (RoutePoints.Count == 0)
+            {
+                StatusMessage = "No route points to save";
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "CoPilot TRP files|*.trp|All files|*.*",
+                DefaultExt = ".trp"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var parser = new CoPilotTrpFileParser();
+                    parser.Write(dialog.FileName, RoutePoints.ToList(), RouteName);
+                    StatusMessage = "Route saved successfully";
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Error saving route: {ex.Message}";
+                }
+            }
         }
 
         private void ExecuteExit()

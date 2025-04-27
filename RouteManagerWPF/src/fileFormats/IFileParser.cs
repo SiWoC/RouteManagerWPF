@@ -4,7 +4,7 @@ namespace nl.siwoc.RouteManager.fileFormats
 {
     public interface IFileParser
     {
-        List<RoutePoint> Read(string filePath);
-        void Write(string filePath, List<RoutePoint> points);
+        (List<RoutePoint> Points, string RouteName) Read(string filePath);
+        void Write(string filePath, List<RoutePoint> points, string routeName = null);
     }
 } 
