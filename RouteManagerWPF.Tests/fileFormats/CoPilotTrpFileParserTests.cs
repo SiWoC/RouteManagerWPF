@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Linq;
 using Xunit;
 using nl.siwoc.RouteManager.fileFormats;
 
@@ -32,6 +30,25 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
         }
 
         [Fact]
+        public void ReadCoPilot9Trp_StopOptions()
+        {
+            // Arrange
+            var parser = new CoPilotTrpFileParser();
+            var filePath = Path.Combine(testDataPath, "SLS.Harz.2025.dag.1.trp");
+
+            // Act
+            var (points, routeName) = parser.Read(filePath);
+
+            // Assert
+            Assert.Equal(11, points.Count);
+            Assert.Equal("SLS Harz 2025 dag 1", routeName);
+            Assert.Equal("Wellerberg 2", points[1].Name);
+            Assert.Equal(51.473040, points[1].Position.Lat, 6);
+            Assert.Equal(9.109070, points[1].Position.Lng, 6);
+            Assert.Equal("Germany-34414 Warburg", points[1].City);
+        }
+
+        [Fact]
         public void ReadCoPilot6_7Trp_ShouldReadAllPoints()
         {
             // Arrange
@@ -43,7 +60,7 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
 
             // Assert
             Assert.Equal(4, points.Count);
-            Assert.Contains("Test copilot 10.trp", routeName);
+            Assert.Equal("Test copilot 6", routeName);
             Assert.Equal("GPS-plaatsbepaling", points[0].City);
             Assert.Equal(52.145097, points[0].Position.Lat, 6);
             Assert.Equal(4.668902, points[0].Position.Lng, 6);
@@ -61,7 +78,7 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
 
             // Assert
             Assert.Equal(4, points.Count);
-            Assert.Contains("Test copilot 10.trp", routeName);
+            Assert.Equal("Test copilot 8", routeName);
             Assert.Equal("GPS-plaatsbepaling", points[0].City);
             Assert.Equal(52.145097, points[0].Position.Lat, 6);
             Assert.Equal(4.668902, points[0].Position.Lng, 6);

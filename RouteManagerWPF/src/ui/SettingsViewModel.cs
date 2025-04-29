@@ -86,10 +86,10 @@ namespace nl.siwoc.RouteManager.ui
         private void UpdateAvailableRoutingProviders()
         {
             AvailableRoutingProviders.Clear();
-            AvailableRoutingProviders.Add(OpenStreetMapProvider.Instance as RoutingProvider);
+            AvailableRoutingProviders.Add(OpenStreetMapProvider.Instance);
             if (!string.IsNullOrEmpty(GoogleApiKey))
             {
-                AvailableRoutingProviders.Add(GoogleMapProvider.Instance as RoutingProvider);
+                AvailableRoutingProviders.Add(GoogleMapProvider.Instance);
             }
         }
 

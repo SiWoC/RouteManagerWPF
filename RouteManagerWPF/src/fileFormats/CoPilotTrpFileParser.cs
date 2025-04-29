@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using GMap.NET;
-using System.Linq;
 
 namespace nl.siwoc.RouteManager.fileFormats
 {
@@ -11,7 +8,8 @@ namespace nl.siwoc.RouteManager.fileFormats
         public (List<RoutePoint> Points, string RouteName) Read(string filePath)
         {
             var points = new List<RoutePoint>();
-            var lines = File.ReadAllLines(filePath, System.Text.Encoding.Unicode);
+            var encoding = FileUtils.DetectEncoding(filePath);
+            var lines = File.ReadAllLines(filePath, encoding);
             var currentStop = new Dictionary<string, string>();
             string tripName = null;
 
@@ -25,7 +23,7 @@ namespace nl.siwoc.RouteManager.fileFormats
                 {
                     currentStop.Clear();
                 }
-                else if (line.StartsWith("End Stop"))
+                else if (line.Equals("End Stop"))
                 {
                     if (currentStop.TryGetValue("Longitude", out var lonStr) && 
                         currentStop.TryGetValue("Latitude", out var latStr) &&
@@ -49,6 +47,7 @@ namespace nl.siwoc.RouteManager.fileFormats
                         point.Name = point.Address;
 
                         points.Add(point);
+                        currentStop.Clear();
                     }
                 }
                 else if (line.Contains("="))

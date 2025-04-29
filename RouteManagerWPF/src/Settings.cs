@@ -17,6 +17,7 @@ namespace nl.siwoc.RouteManager
         private const int DefaultRoadSnapDistance = 500; // meters
         private static readonly GMapProvider DefaultMapProvider = OpenStreetMapProvider.Instance;
         private static readonly RoutingProvider DefaultRoutingProvider = OpenStreetMapProvider.Instance as RoutingProvider;
+        private static readonly string DefaultRoutingProviderName = OpenStreetMapProviderName;
 
         // Cache for settings
         private static string cachedRoutingProviderName;
@@ -26,6 +27,29 @@ namespace nl.siwoc.RouteManager
         private static int? cachedRoadSnapDistance;
         private static string cachedGoogleApiKey;
         private static RoutingProvider cachedRoutingProvider;
+
+        public const string GoogleMapProviderName = "GoogleMapProvider";
+        public const string OpenStreetMapProviderName = "OpenStreetMapProvider";
+
+        /// <summary>
+        /// Gets a curated list of map providers
+        /// </summary>
+        /// <returns>List of selected GMapProviders</returns>
+        public static List<GMapProvider> GetAllMapProviders()
+        {
+            return new List<GMapProvider>
+            {
+                OpenStreetMapProvider.Instance,
+                BingMapProvider.Instance,
+                BingSatelliteMapProvider.Instance,
+                BingHybridMapProvider.Instance,
+                BingOSMapProvider.Instance,
+                GoogleMapProvider.Instance,
+                GoogleSatelliteMapProvider.Instance,
+                GoogleHybridMapProvider.Instance,
+                GoogleTerrainMapProvider.Instance
+            };
+        }
 
         public static string LoadRoutingProviderName()
         {
@@ -48,7 +72,7 @@ namespace nl.siwoc.RouteManager
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to load routing provider name: {ex.Message}");
             }
-            cachedRoutingProviderName = "OpenStreetMap";
+            cachedRoutingProviderName = DefaultRoutingProviderName;
             return cachedRoutingProviderName;
         }
 
@@ -57,8 +81,8 @@ namespace nl.siwoc.RouteManager
             if (cachedRoutingProvider != null)
                 return cachedRoutingProvider;
 
-            var providerName = LoadRoutingProviderName();
-            if (providerName == "GoogleMapProvider")
+            var routingProviderName = LoadRoutingProviderName();
+            if (routingProviderName.Equals(GoogleMapProviderName))
             {
                 var apiKey = LoadGoogleApiKey();
                 if (!string.IsNullOrEmpty(apiKey))
@@ -75,15 +99,15 @@ namespace nl.siwoc.RouteManager
             return DefaultRoutingProvider;
         }
 
-        public static void SaveRoutingProvider(string providerName)
+        public static void SaveRoutingProvider(string routingProviderName)
         {
             try
             {
                 using (var key = Registry.CurrentUser.CreateSubKey(RegistryPath))
                 {
-                    key?.SetValue(RoutingProviderKey, providerName);
-                    System.Diagnostics.Debug.WriteLine($"Saved routing provider to registry: {providerName}");
-                    cachedRoutingProviderName = providerName;
+                    key?.SetValue(RoutingProviderKey, routingProviderName);
+                    System.Diagnostics.Debug.WriteLine($"Saved routing provider to registry: {routingProviderName}");
+                    cachedRoutingProviderName = routingProviderName;
                     cachedRoutingProvider = null; // Invalidate cache
                 }
             }
@@ -123,7 +147,7 @@ namespace nl.siwoc.RouteManager
                     if (key?.GetValue(MapProviderKey) is string providerName)
                     {
                         System.Diagnostics.Debug.WriteLine($"Found saved provider in registry: {providerName}");
-                        var provider = MapControlWrapper.GetAllMapProviders().FirstOrDefault(p => p.Name == providerName);
+                        var provider = GetAllMapProviders().FirstOrDefault(p => p.Name == providerName);
                         if (provider != null)
                         {
                             System.Diagnostics.Debug.WriteLine($"Loaded provider from registry: {provider.Name}");

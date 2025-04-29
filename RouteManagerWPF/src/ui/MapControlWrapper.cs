@@ -29,30 +29,8 @@ namespace nl.siwoc.RouteManager.ui
                 e.Handled = true;
             };
 
-            System.Diagnostics.Debug.WriteLine($"MapControlWrapper initialized with provider: {base.MapProvider?.Name ?? "null"}");
         }
 
-        /// <summary>
-        /// Gets a curated list of map providers
-        /// </summary>
-        /// <returns>List of selected GMapProviders</returns>
-        public static List<GMapProvider> GetAllMapProviders()
-        {
-            return new List<GMapProvider>
-            {
-                OpenStreetMapProvider.Instance,
-                BingMapProvider.Instance,
-                BingSatelliteMapProvider.Instance,
-                BingHybridMapProvider.Instance,
-                BingOSMapProvider.Instance,
-                GoogleMapProvider.Instance,
-                GoogleSatelliteMapProvider.Instance,
-                GoogleHybridMapProvider.Instance,
-                GoogleTerrainMapProvider.Instance,
-                NearMapProvider.Instance,
-                NearSatelliteMapProvider.Instance,
-                NearHybridMapProvider.Instance
-            };
-        }
+
     }
 } 

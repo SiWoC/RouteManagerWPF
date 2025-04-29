@@ -115,9 +115,28 @@
                     <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
 
-                <!-- Route Name -->
-                <GroupBox Grid.Row="0" Header="Route Name">
-                    <TextBox Text="{Binding RouteName, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+                <!-- Route Details -->
+                <GroupBox Grid.Row="0" Header="Route Details" >
+                    <Grid Margin="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="Name:" VerticalAlignment="Center" Padding="0,0,0,0"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding RouteName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="Distance:" VerticalAlignment="Center" Padding="0,0,0,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RouteDistance, StringFormat={}{0:N1} km}" IsReadOnly="True"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Content="Duration:" VerticalAlignment="Center" Padding="0,0,0,0"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding RouteDuration, Mode=OneWay}" IsReadOnly="True"/>
+                    </Grid>
                 </GroupBox>
 
                 <!-- Point Details -->

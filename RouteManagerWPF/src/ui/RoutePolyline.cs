@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using GMap.NET.MapProviders;
 using nl.siwoc.RouteManager;
+using System.Globalization;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -17,8 +18,10 @@ namespace nl.siwoc.RouteManager.ui
             this.mapControl = mapControl;
         }
 
-        public void UpdateRoute(IEnumerable<RoutePoint> points)
+        public (double distance, double duration) UpdateRoute(IEnumerable<RoutePoint> points)
         {
+            double totalDistance = 0;
+            double totalDuration = 0;
             var pointList = points.ToList();
             if (pointList.Count < 2)
             {
@@ -27,7 +30,7 @@ namespace nl.siwoc.RouteManager.ui
                     mapControl.Markers.Remove(gmapRoute);
                     gmapRoute = null;
                 }
-                return;
+                return (totalDistance, totalDuration);
             }
 
             var allPoints = new List<PointLatLng>();
@@ -40,6 +43,8 @@ namespace nl.siwoc.RouteManager.ui
                 if (mapRoute != null)
                 {
                     allPoints.AddRange(mapRoute.Points);
+                    totalDistance += mapRoute.Distance;
+                    totalDuration += ParseDuration(mapRoute.Duration);
                 }
             }
 
@@ -58,6 +63,41 @@ namespace nl.siwoc.RouteManager.ui
                 };
                 mapControl.Markers.Add(gmapRoute);
             }
+
+            return (totalDistance, totalDuration);
+        }
+
+        internal double ParseDuration(string duration)
+        {
+            if (string.IsNullOrEmpty(duration)) return 0;
+
+            var provider = Settings.LoadRoutingProviderName();
+            if (provider == Settings.GoogleMapProviderName)
+            {
+                // Google format: "2 hours 23 mins"
+                double totalSeconds = 0;
+                var parts = duration.Split(' ');
+                for (int i = 0; i < parts.Length; i += 2)
+                {
+                    if (i + 1 >= parts.Length) break;
+                    if (double.TryParse(parts[i], out double value))
+                    {
+                        if (parts[i + 1].StartsWith("hour")) totalSeconds += value * 3600;
+                        else if (parts[i + 1].StartsWith("min")) totalSeconds += value * 60;
+                    }
+                }
+                return totalSeconds;
+            }
+            else if (provider == Settings.OpenStreetMapProviderName)
+            {
+                // OSM format: seconds with decimal comma
+                if (double.TryParse(duration.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double seconds))
+                {
+                    return seconds;
+                }
+            }
+
+            return 0;
         }
 
         public void Clear()

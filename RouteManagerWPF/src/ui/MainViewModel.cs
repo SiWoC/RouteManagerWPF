@@ -27,6 +27,9 @@ namespace nl.siwoc.RouteManager.ui
         private readonly DispatcherTimer updateRouteTimer;
         private bool routeUpdatePending;
         private string routeName;
+        private double routeDistance;
+        private double routeDurationSeconds;
+        private string routeDurationDisplay;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -129,6 +132,32 @@ namespace nl.siwoc.RouteManager.ui
             }
         }
 
+        public double RouteDistance
+        {
+            get => routeDistance;
+            set
+            {
+                if (routeDistance != value)
+                {
+                    routeDistance = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string RouteDuration
+        {
+            get => routeDurationDisplay;
+            private set
+            {
+                if (routeDurationDisplay != value)
+                {
+                    routeDurationDisplay = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public ICommand NewRouteCommand { get; }
         public ICommand OpenRouteCommand { get; }
         public ICommand SaveRouteCommand { get; }
@@ -154,7 +183,9 @@ namespace nl.siwoc.RouteManager.ui
                 if (routeUpdatePending)
                 {
                     routeUpdatePending = false;
-                    routePolyline.UpdateRoute(RoutePoints);
+                    var (distance, duration) = routePolyline.UpdateRoute(RoutePoints);
+                    RouteDistance = distance;
+                    UpdateRouteDuration(duration);
                 }
             };
 
@@ -169,7 +200,7 @@ namespace nl.siwoc.RouteManager.ui
             SettingsCommand = new RelayCommand(ExecuteSettings);
 
             // Initialize map providers
-            foreach (var provider in MapControlWrapper.GetAllMapProviders())
+            foreach (var provider in Settings.GetAllMapProviders())
             {
                 MapProviders.Add(provider);
             }
@@ -483,6 +514,21 @@ namespace nl.siwoc.RouteManager.ui
             for (int i = 0; i < RoutePoints.Count; i++)
             {
                 RoutePoints[i].Index = i + 1;
+            }
+        }
+
+        private void UpdateRouteDuration(double seconds)
+        {
+            routeDurationSeconds = seconds;
+            int hours = (int)(seconds / 3600);
+            int minutes = (int)((seconds % 3600) / 60);
+            if (hours > 0)
+            {
+                RouteDuration = $"{hours}h {minutes}m";
+            }
+            else
+            {
+                RouteDuration = $"{minutes}m";
             }
         }
 
