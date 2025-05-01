@@ -13,6 +13,8 @@ namespace nl.siwoc.RouteManager.ui
         private int roadSnapDistance;
         private string googleApiKey;
         private RoutingProvider selectedRoutingProvider;
+        private bool routeProviderChanged = false;
+        private readonly MainViewModel mainViewModel;
         public ObservableCollection<RoutingProvider> AvailableRoutingProviders { get; } = new ObservableCollection<RoutingProvider>();
 
         public int RoadSnapDistance
@@ -65,6 +67,7 @@ namespace nl.siwoc.RouteManager.ui
                 {
                     selectedRoutingProvider = value;
                     OnPropertyChanged();
+                    routeProviderChanged = true;
                 }
             }
         }
@@ -93,8 +96,9 @@ namespace nl.siwoc.RouteManager.ui
             }
         }
 
-        public SettingsViewModel()
+        public SettingsViewModel(MainViewModel mainViewModel)
         {
+            this.mainViewModel = mainViewModel;
             StartLatitude = Settings.LoadStartLatitude();
             StartLongitude = Settings.LoadStartLongitude();
             RoadSnapDistance = Settings.LoadRoadSnapDistance();
@@ -111,6 +115,11 @@ namespace nl.siwoc.RouteManager.ui
             Settings.SaveRoadSnapDistance(RoadSnapDistance);
             Settings.SaveGoogleApiKey(GoogleApiKey);
             Settings.SaveRoutingProvider(SelectedRoutingProvider.GetType().Name);
+            if (routeProviderChanged)
+            {
+                mainViewModel?.ScheduleRouteUpdate();
+                routeProviderChanged = false;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

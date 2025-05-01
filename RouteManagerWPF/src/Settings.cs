@@ -14,10 +14,12 @@ namespace nl.siwoc.RouteManager
         private const string RoadSnapDistanceKey = "RoadSnapDistance";
         private const string GoogleApiKeyKey = "GoogleApiKey";
         private const string RoutingProviderKey = "RoutingProvider";
+        private const string ShowTrafficLayerKey = "ShowTrafficLayer";
         private const int DefaultRoadSnapDistance = 500; // meters
         private static readonly GMapProvider DefaultMapProvider = OpenStreetMapProvider.Instance;
         private static readonly RoutingProvider DefaultRoutingProvider = OpenStreetMapProvider.Instance as RoutingProvider;
         private static readonly string DefaultRoutingProviderName = OpenStreetMapProviderName;
+        private static readonly bool DefaultShowTrafficLayer = false;
 
         // Cache for settings
         private static string cachedRoutingProviderName;
@@ -27,6 +29,7 @@ namespace nl.siwoc.RouteManager
         private static int? cachedRoadSnapDistance;
         private static string cachedGoogleApiKey;
         private static RoutingProvider cachedRoutingProvider;
+        private static bool? cachedShowTrafficLayer;
 
         public const string GoogleMapProviderName = "GoogleMapProvider";
         public const string OpenStreetMapProviderName = "OpenStreetMapProvider";
@@ -265,6 +268,48 @@ namespace nl.siwoc.RouteManager
             GoogleTerrainMapProvider.Instance.ApiKey = apiKey;
             
             return apiKey;
+        }
+
+        public static void SaveShowTrafficLayer(bool showTrafficLayer)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.CreateSubKey(RegistryPath))
+                {
+                    key?.SetValue(ShowTrafficLayerKey, showTrafficLayer ? 1 : 0);
+                    System.Diagnostics.Debug.WriteLine($"Saved show traffic layer to registry: {showTrafficLayer}");
+                    cachedShowTrafficLayer = showTrafficLayer;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to save show traffic layer: {ex.Message}");
+            }
+        }
+
+        public static bool LoadShowTrafficLayer()
+        {
+            if (cachedShowTrafficLayer.HasValue)
+                return cachedShowTrafficLayer.Value;
+
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(RegistryPath))
+                {
+                    if (key?.GetValue(ShowTrafficLayerKey) is int value)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Loaded show traffic layer from registry: {value != 0}");
+                        cachedShowTrafficLayer = value != 0;
+                        return value != 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load show traffic layer: {ex.Message}");
+            }
+            cachedShowTrafficLayer = DefaultShowTrafficLayer;
+            return DefaultShowTrafficLayer;
         }
     }
 } 

@@ -20,6 +20,7 @@ namespace nl.siwoc.RouteManager.ui
         private ObservableCollection<RoutePoint> routePoints = new ObservableCollection<RoutePoint>();
         private PointLatLng center;
         private GMapProvider mapProvider;
+        private bool showTrafficLayer;
         private readonly MapControlWrapper mapControl;
         private RoutePoint selectedPoint;
         private RoutePoint draggedItem;
@@ -45,18 +46,39 @@ namespace nl.siwoc.RouteManager.ui
                 if (mapProvider != value)
                 {
                     System.Diagnostics.Debug.WriteLine($"MainViewModel MapProvider changing from {mapProvider?.Name ?? "null"} to {value?.Name ?? "null"}");
-                    mapProvider = value;
+                    GoogleMapProvider googleMapProvider = value as GoogleMapProvider;
+                    if (googleMapProvider != null && showTrafficLayer)
+                    {
+                        googleMapProvider.Version = "m,traffic";
+                        mapProvider = googleMapProvider;
+                    }
+                    else
+                    {
+                        mapProvider = value;
+                    }
                     OnPropertyChanged();
                     
                     // Update the MapControlWrapper
-                    if (mapControl != null)
-                    {
-                        mapControl.MapProvider = value;
-                        System.Diagnostics.Debug.WriteLine($"MapControlWrapper MapProvider set to: {value?.Name ?? "null"}");
-                    }
+                    mapControl.MapProvider = mapProvider;
+                    System.Diagnostics.Debug.WriteLine($"MapControlWrapper MapProvider set to: {value?.Name ?? "null"}");
 
                     // Save the provider
                     Settings.SaveMapProvider(value);
+                }
+            }
+        }
+
+        public bool ShowTrafficLayer
+        {
+            get => showTrafficLayer;
+            set
+            {
+                if (showTrafficLayer != value)
+                {
+                    showTrafficLayer = value;
+                    OnPropertyChanged();
+                    Settings.SaveShowTrafficLayer(value);
+                    UpdateTrafficLayer();
                 }
             }
         }
@@ -240,13 +262,14 @@ namespace nl.siwoc.RouteManager.ui
                 MapProviders.Add(provider);
             }
 
-            // Load saved provider
+            showTrafficLayer = Settings.LoadShowTrafficLayer();
             MapProvider = Settings.LoadMapProvider();
+
             // Initialize route polyline after provider is set
             routePolyline = new RoutePolyline(mapControl);
         }
 
-        private void ScheduleRouteUpdate()
+        internal void ScheduleRouteUpdate()
         {
             routeUpdatePending = true;
             updateRouteTimer.Stop();
@@ -488,10 +511,19 @@ namespace nl.siwoc.RouteManager.ui
 
         private void ExecuteAddPointAtLocation()
         {
-            var newPoint = new RoutePoint(RoutePoints.Count + 1, GetNearestPointOnRoad(mapControl.LastRightClickPosition));
+            var newPoint = new RoutePoint(0, GetNearestPointOnRoad(mapControl.LastRightClickPosition));
             EnrichRoutePoint(newPoint);
             newPoint.MapControl = mapControl;
-            RoutePoints.Add(newPoint);
+            
+            if (SelectedPoint != null)
+            {
+                RoutePoints.Insert(RoutePoints.IndexOf(SelectedPoint) + 1, newPoint);
+                UpdateRoutePointIndices();
+            }
+            else
+            {
+                RoutePoints.Add(newPoint);
+            }
             SelectedPoint = newPoint;
         }
 
@@ -541,7 +573,8 @@ namespace nl.siwoc.RouteManager.ui
         {
             var settingsWindow = new SettingsWindow
             {
-                Owner = Application.Current.MainWindow
+                Owner = Application.Current.MainWindow,
+                DataContext = new SettingsViewModel(this)
             };
             if (settingsWindow.ShowDialog() == true)
             {
@@ -628,6 +661,24 @@ namespace nl.siwoc.RouteManager.ui
                 title += " *";
             }
             Application.Current.MainWindow.Title = title;
+        }
+
+        public void UpdateRouteForProviderChange()
+        {
+            routeUpdatePending = true;
+            updateRouteTimer.Stop();
+            updateRouteTimer.Start();
+        }
+
+        private void UpdateTrafficLayer()
+        {
+            if (mapProvider is GoogleMapProvider googleMapProvider)
+            {
+                googleMapProvider.Version = showTrafficLayer ? "m,traffic" : "m";
+                // Clear Google Maps cache to ensure traffic layer changes take effect
+                GMaps.Instance.PrimaryCache.DeleteOlderThan(DateTime.Now, null);
+                mapControl.MapProvider = mapProvider; // Force refresh
+            }
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

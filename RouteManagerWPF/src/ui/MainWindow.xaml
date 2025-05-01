@@ -66,18 +66,23 @@
         <!-- Main Content -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="700*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="300*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Map Provider Selection -->
-            <GroupBox Grid.Column="0" Height="55" Width="160" Header="Map Provider" Panel.ZIndex="5" 
-                     HorizontalAlignment="Left" VerticalAlignment="Top">
-                <ComboBox x:Name="MapProviderComboBox"
-                             ItemsSource="{Binding MapProviders}"
-                             SelectedItem="{Binding MapProvider, Mode=TwoWay}"
-                             DisplayMemberPath="Name"/>
+            <GroupBox Grid.Column="0" Height="55" Width="auto" Header="Map Provider" Panel.ZIndex="5" 
+                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4">
+                <StackPanel Orientation="Horizontal" >
+                    <ComboBox x:Name="MapProviderComboBox"
+                        Width="160"
+                        ItemsSource="{Binding MapProviders}"
+                        SelectedItem="{Binding MapProvider, Mode=TwoWay}"
+                        DisplayMemberPath="Name"/>
+                    <Label Content="Traffic:" VerticalAlignment="Center" Padding="0,0,0,0"/>
+                    <CheckBox IsChecked="{Binding ShowTrafficLayer, Mode=TwoWay}" VerticalAlignment="Center"/>
+                </StackPanel>
             </GroupBox>
 
             <!-- Map View -->

@@ -9,7 +9,6 @@ namespace nl.siwoc.RouteManager.ui
         public SettingsWindow()
         {
             InitializeComponent();
-            DataContext = new SettingsViewModel();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
