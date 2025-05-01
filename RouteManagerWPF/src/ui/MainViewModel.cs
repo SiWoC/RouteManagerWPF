@@ -26,10 +26,12 @@ namespace nl.siwoc.RouteManager.ui
         private readonly RoutePolyline routePolyline;
         private readonly DispatcherTimer updateRouteTimer;
         private bool routeUpdatePending;
-        private string routeName;
+        private string routeName = "New Route";
         private double routeDistance;
         private double routeDurationSeconds;
         private string routeDurationDisplay;
+        private bool isDirty;
+        private string currentFileName;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -127,6 +129,7 @@ namespace nl.siwoc.RouteManager.ui
                 if (routeName != value)
                 {
                     routeName = value;
+                    IsDirty = true;
                     OnPropertyChanged();
                 }
             }
@@ -154,6 +157,34 @@ namespace nl.siwoc.RouteManager.ui
                 {
                     routeDurationDisplay = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsDirty
+        {
+            get => isDirty;
+            set
+            {
+                if (isDirty != value)
+                {
+                    isDirty = value;
+                    OnPropertyChanged();
+                    UpdateWindowTitle();
+                }
+            }
+        }
+
+        public string CurrentFileName
+        {
+            get => currentFileName;
+            set
+            {
+                if (currentFileName != value)
+                {
+                    currentFileName = value;
+                    OnPropertyChanged();
+                    UpdateWindowTitle();
                 }
             }
         }
@@ -218,6 +249,37 @@ namespace nl.siwoc.RouteManager.ui
             updateRouteTimer.Start();
         }
 
+        private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ScheduleRouteUpdate();
+            IsDirty = true;
+
+            if (e.NewItems != null)
+            {
+                foreach (RoutePoint point in e.NewItems)
+                {
+                    if (point.MapControl != null)
+                    {
+                        point.PropertyChanged += RoutePoint_PropertyChanged;
+                        SetupFlagEvents(point);
+                    }
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (RoutePoint point in e.OldItems)
+                {
+                    point.PropertyChanged -= RoutePoint_PropertyChanged;
+                }
+            }
+        }
+
+        private void RoutePoint_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            IsDirty = true;
+        }
+
         private void SetupFlagEvents(RoutePoint point)
         {
             var flagMarker = (FlagMarker)point.Marker.Shape;
@@ -236,32 +298,36 @@ namespace nl.siwoc.RouteManager.ui
             });
         }
 
-        private void RoutePoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private bool ConfirmUnsavedChanges()
         {
-            ScheduleRouteUpdate();
+            if (!IsDirty) return true;
 
-            if (e.NewItems != null)
+            var result = MessageBox.Show("The route has changed, do you want to save?", "Unsaved Changes", MessageBoxButton.YesNoCancel);
+            if (result == MessageBoxResult.Yes)
             {
-                foreach (RoutePoint point in e.NewItems)
-                {
-                    if (point.MapControl != null)
-                    {
-                        SetupFlagEvents(point);
-                    }
-                }
+                ExecuteSaveRoute();
+                return !IsDirty; // Return false if user cancelled save
             }
+            return result != MessageBoxResult.Cancel;
         }
 
         private void ExecuteNewRoute()
         {
+            if (!ConfirmUnsavedChanges()) return;
+
             mapControl.Markers.Clear();
             RoutePoints.Clear();
             routePolyline.Clear(); // will not be cleared automatically by recreation as with OpenRoute
             StatusMessage = "New route created";
+            RouteName = "New Route";
+            CurrentFileName = null;
+            IsDirty = false;
         }
 
         private void ExecuteOpenRoute()
         {
+            if (!ConfirmUnsavedChanges()) return;
+
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
                 Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
@@ -294,10 +360,13 @@ namespace nl.siwoc.RouteManager.ui
                     foreach (var point in points)
                     {
                         point.MapControl = mapControl;
+                        point.PropertyChanged += RoutePoint_PropertyChanged;
                         SetupFlagEvents(point);
                         RoutePoints.Add(point);
                     }
                     RouteName = routeName;
+                    CurrentFileName = dialog.FileName;
+                    IsDirty = false;
                     ExecuteFitToRoute();
                     
                     StatusMessage = "Route loaded successfully";
@@ -327,7 +396,8 @@ namespace nl.siwoc.RouteManager.ui
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
-                DefaultExt = ".trp"
+                DefaultExt = ".trp",
+                FileName = CurrentFileName
             };
 
             if (dialog.ShowDialog() == true)
@@ -344,6 +414,8 @@ namespace nl.siwoc.RouteManager.ui
                         parser = new CoPilotTrpFileParser();
                     }
                     parser.Write(dialog.FileName, RoutePoints.ToList(), RouteName);
+                    CurrentFileName = dialog.FileName;
+                    IsDirty = false;
                     StatusMessage = "Route saved successfully";
                 }
                 catch (Exception ex)
@@ -355,6 +427,7 @@ namespace nl.siwoc.RouteManager.ui
 
         private void ExecuteExit()
         {
+            if (!ConfirmUnsavedChanges()) return;
             Application.Current.Shutdown();
         }
 
@@ -530,6 +603,24 @@ namespace nl.siwoc.RouteManager.ui
             {
                 RouteDuration = $"{minutes}m";
             }
+        }
+
+        private void UpdateWindowTitle()
+        {
+            var title = "Route Manager";
+            if (!string.IsNullOrEmpty(CurrentFileName))
+            {
+                title += $" - {System.IO.Path.GetFileName(CurrentFileName)}";
+            }
+            if (!string.IsNullOrEmpty(RouteName))
+            {
+                title += $" - {RouteName}";
+            }
+            if (IsDirty)
+            {
+                title += " *";
+            }
+            Application.Current.MainWindow.Title = title;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
