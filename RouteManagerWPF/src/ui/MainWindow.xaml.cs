@@ -13,6 +13,15 @@ namespace nl.siwoc.RouteManager.ui
         {
             InitializeComponent();
             DataContext = new MainViewModel(mapControl);
+            Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!ViewModel.ConfirmUnsavedChanges())
+            {
+                e.Cancel = true;
+            }
         }
 
         private void RoutePointsDataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -28,6 +37,15 @@ namespace nl.siwoc.RouteManager.ui
         private void RoutePointsDataGrid_DragOver(object sender, DragEventArgs e)
         {
             ViewModel.RoutePointsDataGrid_HandleDragOver(e);
+        }
+
+        public void ScrollToSelectedPoint()
+        {
+            if (RoutePointsDataGrid.SelectedItem != null)
+            {
+                RoutePointsDataGrid.ScrollIntoView(RoutePointsDataGrid.SelectedItem);
+                RoutePointsDataGrid.Focus();
+            }
         }
     }
 } 

@@ -117,6 +117,10 @@ namespace nl.siwoc.RouteManager.ui
                 {
                     selectedPoint = value;
                     OnPropertyChanged();
+                    if (Application.Current.MainWindow is MainWindow mainWindow)
+                    {
+                        mainWindow.ScrollToSelectedPoint();
+                    }
                 }
             }
         }
@@ -298,15 +302,17 @@ namespace nl.siwoc.RouteManager.ui
             });
         }
 
-        private bool ConfirmUnsavedChanges()
+        internal bool ConfirmUnsavedChanges()
         {
-            if (!IsDirty) return true;
+            if (!IsDirty || routePoints.Count == 0) return true;
 
             var result = MessageBox.Show("The route has changed, do you want to save?", "Unsaved Changes", MessageBoxButton.YesNoCancel);
             if (result == MessageBoxResult.Yes)
             {
                 ExecuteSaveRoute();
                 return !IsDirty; // Return false if user cancelled save
+            } else if (result == MessageBoxResult.No) {
+                isDirty = false;
             }
             return result != MessageBoxResult.Cancel;
         }
@@ -486,6 +492,7 @@ namespace nl.siwoc.RouteManager.ui
             EnrichRoutePoint(newPoint);
             newPoint.MapControl = mapControl;
             RoutePoints.Add(newPoint);
+            SelectedPoint = newPoint;
         }
 
         private void EnrichRoutePoint(RoutePoint routePoint)
