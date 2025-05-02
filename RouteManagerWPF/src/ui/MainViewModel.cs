@@ -29,7 +29,6 @@ namespace nl.siwoc.RouteManager.ui
         private bool routeUpdatePending;
         private string routeName = "New Route";
         private double routeDistance;
-        private double routeDurationSeconds;
         private string routeDurationDisplay;
         private bool isDirty;
         private string currentFileName;
@@ -511,7 +510,7 @@ namespace nl.siwoc.RouteManager.ui
 
         private void ExecuteAddPointAtLocation()
         {
-            var newPoint = new RoutePoint(0, GetNearestPointOnRoad(mapControl.LastRightClickPosition));
+            var newPoint = new RoutePoint(1, GetNearestPointOnRoad(mapControl.LastRightClickPosition));
             EnrichRoutePoint(newPoint);
             newPoint.MapControl = mapControl;
             
@@ -632,7 +631,6 @@ namespace nl.siwoc.RouteManager.ui
 
         private void UpdateRouteDuration(double seconds)
         {
-            routeDurationSeconds = seconds;
             int hours = (int)(seconds / 3600);
             int minutes = (int)((seconds % 3600) / 60);
             if (hours > 0)
@@ -663,19 +661,13 @@ namespace nl.siwoc.RouteManager.ui
             Application.Current.MainWindow.Title = title;
         }
 
-        public void UpdateRouteForProviderChange()
-        {
-            routeUpdatePending = true;
-            updateRouteTimer.Stop();
-            updateRouteTimer.Start();
-        }
-
         private void UpdateTrafficLayer()
         {
             if (mapProvider is GoogleMapProvider googleMapProvider)
             {
                 googleMapProvider.Version = showTrafficLayer ? "m,traffic" : "m";
                 // Clear Google Maps cache to ensure traffic layer changes take effect
+                GMaps.Instance.MemoryCache.Clear();
                 GMaps.Instance.PrimaryCache.DeleteOlderThan(DateTime.Now, null);
                 mapControl.MapProvider = mapProvider; // Force refresh
             }
