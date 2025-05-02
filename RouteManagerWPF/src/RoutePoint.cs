@@ -22,6 +22,8 @@ namespace nl.siwoc.RouteManager
         private string address;
         private bool isStop;
         private bool isFinish;
+        private double cumulativeDistance;
+        private string cumulativeDuration;
         public GMapMarker Marker { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,34 +44,6 @@ namespace nl.siwoc.RouteManager
             Index = index;
         }
 
-        public MapControlWrapper MapControl
-        {
-            get => mapControl;
-            set
-            {
-                if (mapControl != value)
-                {
-                    // Remove old marker if exists
-                    if (mapControl != null && Marker != null)
-                    {
-                        mapControl.Markers.Remove(Marker);
-                    }
-
-                    mapControl = value;
-
-                    // Create new marker if we have a map control
-                    if (mapControl != null)
-                    {
-                        Marker = new GMapMarker(Position);
-                        var flagMarker = new FlagMarker(mapControl, Marker, Index);
-                        Marker.Shape = flagMarker;
-                        Marker.ZIndex = 100;
-                        mapControl.Markers.Add(Marker);
-                    }
-                }
-            }
-        }
-
         public int Index
         {
             get => index;
@@ -88,29 +62,22 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public void UpdateStyle()
+        public PointLatLng Position
         {
-            if (Marker?.Shape is FlagMarker flagMarker)
+            get => position;
+            set
             {
-                if (index == 1)
+                if (position != value)
                 {
-                    flagMarker.SetStyle(FlagMarker.FlagStyle.Start);
-                }
-                else if (isFinish)
-                {
-                    flagMarker.SetStyle(FlagMarker.FlagStyle.Finish);
-                }
-                else if (isStop)
-                {
-                    flagMarker.SetStyle(FlagMarker.FlagStyle.Stop);
-                }
-                else
-                {
-                    flagMarker.SetStyle(FlagMarker.FlagStyle.RoutePoint);
+                    position = value;
+                    if (Marker != null)
+                    {
+                        Marker.Position = value;
+                    }
+                    OnPropertyChanged();
                 }
             }
         }
-
         public string Name
         {
             get => name;
@@ -134,7 +101,6 @@ namespace nl.siwoc.RouteManager
                 {
                     country = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(DisplayText));
                 }
             }
         }
@@ -162,7 +128,6 @@ namespace nl.siwoc.RouteManager
                 {
                     zip = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(DisplayText));
                 }
             }
         }
@@ -199,7 +164,6 @@ namespace nl.siwoc.RouteManager
                         UpdateStyle();
                     }
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(DisplayText));
                 }
             }
         }
@@ -220,6 +184,34 @@ namespace nl.siwoc.RouteManager
             } 
         }
 
+        public MapControlWrapper MapControl
+        {
+            get => mapControl;
+            set
+            {
+                if (mapControl != value)
+                {
+                    // Remove old marker if exists
+                    if (mapControl != null && Marker != null)
+                    {
+                        mapControl.Markers.Remove(Marker);
+                    }
+
+                    mapControl = value;
+
+                    // Create new marker if we have a map control
+                    if (mapControl != null)
+                    {
+                        Marker = new GMapMarker(Position);
+                        var flagMarker = new FlagMarker(mapControl, Marker, Index);
+                        Marker.Shape = flagMarker;
+                        Marker.ZIndex = 100;
+                        mapControl.Markers.Add(Marker);
+                    }
+                }
+            }
+        }
+
         public string DisplayText
         {
             get
@@ -229,19 +221,64 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public PointLatLng Position
+        public double CumulativeDistance
         {
-            get => position;
+            get
+            {
+                return cumulativeDistance;
+            }
             set
             {
-                if (position != value)
+                if (cumulativeDistance != value)
                 {
-                    position = value;
-                    if (Marker != null)
-                    {
-                        Marker.Position = value;
-                    }
+                    cumulativeDistance = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        public string CumulativeDuration
+        {
+            get
+            {
+                if (cumulativeDuration == null)
+                {
+                    return "0m";
+                }
+                else
+                {
+                    return cumulativeDuration;
+                }
+            }
+            set
+            {
+                if (cumulativeDuration != value)
+                {
+                    cumulativeDuration = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void UpdateStyle()
+        {
+            if (Marker?.Shape is FlagMarker flagMarker)
+            {
+                if (index == 1)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Start);
+                }
+                else if (isFinish)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Finish);
+                }
+                else if (isStop)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Stop);
+                }
+                else
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.RoutePoint);
                 }
             }
         }

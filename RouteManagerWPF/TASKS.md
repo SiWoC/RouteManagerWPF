@@ -1,7 +1,6 @@
 # Project Tasks
 
 ## To Do
-- cumulative duration to determine coffee and lunch stops
 - Implement file parsers based on file dialog box filter options
 - Add point from text
 

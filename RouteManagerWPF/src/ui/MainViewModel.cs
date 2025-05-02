@@ -241,7 +241,7 @@ namespace nl.siwoc.RouteManager.ui
                     routeUpdatePending = false;
                     var (distance, duration) = routePolyline.UpdateRoute(RoutePoints);
                     RouteDistance = distance;
-                    UpdateRouteDuration(duration);
+                    RouteDuration = Utils.ConvertRouteDuration(duration);
                 }
             };
 
@@ -303,7 +303,13 @@ namespace nl.siwoc.RouteManager.ui
 
         private void RoutePoint_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            IsDirty = true;
+            // Don't mark as dirty for calculated fields
+            if (e.PropertyName != nameof(RoutePoint.DisplayText) && 
+                e.PropertyName != nameof(RoutePoint.CumulativeDistance) &&
+                e.PropertyName != nameof(RoutePoint.CumulativeDuration))
+            {
+                IsDirty = true;
+            }
         }
 
         private void SetupFlagEvents(RoutePoint point)
@@ -397,6 +403,7 @@ namespace nl.siwoc.RouteManager.ui
                     CurrentFileName = dialog.FileName;
                     IsDirty = false;
                     ExecuteFitToRoute();
+                    SelectedPoint = RoutePoints[0];
                     
                     StatusMessage = "Route loaded successfully";
                 }
@@ -629,20 +636,6 @@ namespace nl.siwoc.RouteManager.ui
                 RoutePoints[i].Index = i + 1;
                 RoutePoints[i].IsFinish = (i == RoutePoints.Count - 1);
                 RoutePoints[i].UpdateStyle();
-            }
-        }
-
-        private void UpdateRouteDuration(double seconds)
-        {
-            int hours = (int)(seconds / 3600);
-            int minutes = (int)((seconds % 3600) / 60);
-            if (hours > 0)
-            {
-                RouteDuration = $"{hours}h {minutes}m";
-            }
-            else
-            {
-                RouteDuration = $"{minutes}m";
             }
         }
 

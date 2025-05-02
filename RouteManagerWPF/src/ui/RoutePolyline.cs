@@ -33,6 +33,7 @@ namespace nl.siwoc.RouteManager.ui
                 return (totalDistance, totalDuration);
             }
 
+            // accumulates all polyline points from all route segments
             var allPoints = new List<PointLatLng>();
             for (int i = 0; i < pointList.Count - 1; i++)
             {
@@ -45,6 +46,8 @@ namespace nl.siwoc.RouteManager.ui
                     allPoints.AddRange(mapRoute.Points);
                     totalDistance += mapRoute.Distance;
                     totalDuration += ParseDuration(mapRoute.Duration);
+                    pointList[i + 1].CumulativeDistance = totalDistance;
+                    pointList[i + 1].CumulativeDuration = Utils.ConvertRouteDuration(totalDuration);
                 }
             }
 

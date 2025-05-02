@@ -216,6 +216,8 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="Auto" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Point" Binding="{Binding DisplayText}" Width="*"/>
+                            <DataGridTextColumn Header="Cum. Dist." Binding="{Binding CumulativeDistance, StringFormat={}{0:N1} km}" Width="70"/>
+                            <DataGridTextColumn Header="Cum. Dur." Binding="{Binding CumulativeDuration}" Width="70"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </GroupBox>
