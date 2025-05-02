@@ -392,6 +392,7 @@ namespace nl.siwoc.RouteManager.ui
                         SetupFlagEvents(point);
                         RoutePoints.Add(point);
                     }
+                    UpdateRoutePointIndices();
                     RouteName = routeName;
                     CurrentFileName = dialog.FileName;
                     IsDirty = false;
@@ -517,13 +518,13 @@ namespace nl.siwoc.RouteManager.ui
             if (SelectedPoint != null)
             {
                 RoutePoints.Insert(RoutePoints.IndexOf(SelectedPoint) + 1, newPoint);
-                UpdateRoutePointIndices();
             }
             else
             {
                 RoutePoints.Add(newPoint);
             }
             SelectedPoint = newPoint;
+            UpdateRoutePointIndices();
         }
 
         private void EnrichRoutePoint(RoutePoint routePoint)
@@ -626,6 +627,8 @@ namespace nl.siwoc.RouteManager.ui
             for (int i = 0; i < RoutePoints.Count; i++)
             {
                 RoutePoints[i].Index = i + 1;
+                RoutePoints[i].IsFinish = (i == RoutePoints.Count - 1);
+                RoutePoints[i].UpdateStyle();
             }
         }
 

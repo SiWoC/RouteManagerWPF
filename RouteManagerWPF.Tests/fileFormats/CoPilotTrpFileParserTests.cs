@@ -22,10 +22,10 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
             Assert.Equal(13, points.Count);
             Assert.Equal("Cols Vogezen", routeName);
             Assert.Equal("D1420", points[0].Name);
-            Assert.Equal(48.505021, points[0].Position.Lat, 6);
-            Assert.Equal(7.278500, points[0].Position.Lng, 6);
+            Assert.Equal(48.50517, points[0].Position.Lat, 6);
+            Assert.Equal(7.27898, points[0].Position.Lng, 6);
             Assert.Equal("Russ", points[0].City);
-            Assert.Equal("Franche", points[0].Country);
+            Assert.Equal("France", points[0].Country);
             Assert.Equal("67130", points[0].Zip);
         }
 

@@ -10,6 +10,8 @@ namespace nl.siwoc.RouteManager.ui
 {
     public partial class FlagMarker
     {
+        public enum FlagStyle { Start, Stop, RoutePoint, Finish }
+
         private GMapMarker _marker;
         private MapControlWrapper mapControl;
         private Point _dragStartPoint;
@@ -23,18 +25,15 @@ namespace nl.siwoc.RouteManager.ui
             set
             {
                 FlagText.Text = value.ToString();
-                if (value == 1)
-                {
-                    FlagCloth.Fill = Brushes.Green;
-                }
-                else
-                {
-                    FlagCloth.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF00A7D8");
-                }
             }
         }
 
-        public FlagMarker(MapControlWrapper mapControl, GMapMarker marker, string title, int index)
+        public void SetStyle(FlagStyle style) 
+        {
+            FlagCloth.Style = (Style)Resources[style.ToString()];
+        }
+
+        public FlagMarker(MapControlWrapper mapControl, GMapMarker marker, int index)
         {
             InitializeComponent();
 

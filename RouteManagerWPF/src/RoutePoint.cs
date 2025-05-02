@@ -21,6 +21,7 @@ namespace nl.siwoc.RouteManager
         private string zip;
         private string address;
         private bool isStop;
+        private bool isFinish;
         public GMapMarker Marker { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -60,11 +61,52 @@ namespace nl.siwoc.RouteManager
                     if (mapControl != null)
                     {
                         Marker = new GMapMarker(Position);
-                        var flagMarker = new FlagMarker(mapControl, Marker, Name, Index);
+                        var flagMarker = new FlagMarker(mapControl, Marker, Index);
                         Marker.Shape = flagMarker;
                         Marker.ZIndex = 100;
                         mapControl.Markers.Add(Marker);
                     }
+                }
+            }
+        }
+
+        public int Index
+        {
+            get => index;
+            set
+            {
+                if (index != value)
+                {
+                    index = value;
+                    if (Marker?.Shape is FlagMarker flagMarker)
+                    {
+                        flagMarker.Index = value;
+                        UpdateStyle();
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void UpdateStyle()
+        {
+            if (Marker?.Shape is FlagMarker flagMarker)
+            {
+                if (index == 1)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Start);
+                }
+                else if (isFinish)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Finish);
+                }
+                else if (isStop)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Stop);
+                }
+                else
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.RoutePoint);
                 }
             }
         }
@@ -152,10 +194,30 @@ namespace nl.siwoc.RouteManager
                 if (isStop != value)
                 {
                     isStop = value;
+                    if (Marker?.Shape is FlagMarker flagMarker)
+                    {
+                        UpdateStyle();
+                    }
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(DisplayText));
                 }
             }
+        }
+
+        public bool IsFinish 
+        { 
+            get => isFinish;
+            set { 
+                if (isFinish != value)
+                {
+                    isFinish = value;
+                    if (Marker?.Shape is FlagMarker flagMarker)
+                    {
+                        UpdateStyle();
+                    }
+                    OnPropertyChanged();
+                }
+            } 
         }
 
         public string DisplayText
@@ -164,23 +226,6 @@ namespace nl.siwoc.RouteManager
             {
                 var addressText = string.Join(", ", new[] { Address, City }.Where(s => !string.IsNullOrEmpty(s)));
                 return !string.IsNullOrEmpty(addressText) ? addressText : Name;
-            }
-        }
-
-        public int Index
-        {
-            get => index;
-            set
-            {
-                if (index != value)
-                {
-                    index = value;
-                    if (Marker?.Shape is FlagMarker flagMarker)
-                    {
-                        flagMarker.Index = value;
-                    }
-                    OnPropertyChanged();
-                }
             }
         }
 

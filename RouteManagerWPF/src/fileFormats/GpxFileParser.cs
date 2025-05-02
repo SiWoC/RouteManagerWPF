@@ -54,23 +54,32 @@ namespace nl.siwoc.RouteManager.fileFormats
             {
                 routeName = route.Element(ns + "name")?.Value;
                 var routePoints = route.Elements(ns + "rtept");
+                RoutePoint point = null;
 
                 foreach (var rtept in routePoints)
                 {
-                    var lat = double.Parse(rtept.Attribute("lat").Value, CultureInfo.InvariantCulture);
-                    var lon = double.Parse(rtept.Attribute("lon").Value, CultureInfo.InvariantCulture);
-                    var name = rtept.Element(ns + "name")?.Value;
-
-                    var point = new RoutePoint(points.Count + 1, new PointLatLng(lat, lon))
-                    {
-                        Name = name
-                    };
-
+                    point = CreateRoutePoint(rtept.Attribute("lat").Value, rtept.Attribute("lon").Value, points.Count + 1, rtept.Element(ns + "name")?.Value);
                     points.Add(point);
+                }
+                if (point != null)
+                {
+                    point.IsFinish = true;
                 }
             }
 
             return (points, routeName);
+        }
+
+        private static RoutePoint CreateRoutePoint(string latStr,string lonStr, int index, string name)
+        {
+            var lat = double.Parse(latStr, CultureInfo.InvariantCulture);
+            var lon = double.Parse(lonStr, CultureInfo.InvariantCulture);
+
+            var point = new RoutePoint(index, new PointLatLng(lat, lon))
+            {
+                Name = name
+            };
+            return point;
         }
 
         private (List<RoutePoint> Points, string RouteName) ReadTrackPoints(XElement gpx, XNamespace ns)
@@ -87,41 +96,36 @@ namespace nl.siwoc.RouteManager.fileFormats
                 foreach (var segment in segments)
                 {
                     var trackPoints = segment.Elements(ns + "trkpt").ToList();
-                    
+                    XElement trkpt;
+                    RoutePoint point = null;
+
                     // If we have more than 100 points, sample evenly
                     if (trackPoints.Count > 100)
                     {
                         var step = (double)(trackPoints.Count - 1) / 100;
                         for (double i = 0; i < trackPoints.Count - 1; i += step)
                         {
-                            var trkpt = trackPoints[(int)i];
-                            var lat = double.Parse(trkpt.Attribute("lat").Value, CultureInfo.InvariantCulture);
-                            var lon = double.Parse(trkpt.Attribute("lon").Value, CultureInfo.InvariantCulture);
-                            var name = trkpt.Element(ns + "name")?.Value;
-                            points.Add(new RoutePoint(points.Count + 1, new PointLatLng(lat, lon)) { Name = name });
+                            trkpt = trackPoints[(int)i];
+                            point = CreateRoutePoint(trkpt.Attribute("lat").Value, trkpt.Attribute("lon").Value, points.Count + 1, trkpt.Element(ns + "name")?.Value);
+                            points.Add(point);
                         }
 
                         // Always include last point
-                        var lastPoint = trackPoints[trackPoints.Count - 1];
-                        var lastLat = double.Parse(lastPoint.Attribute("lat").Value, CultureInfo.InvariantCulture);
-                        var lastLon = double.Parse(lastPoint.Attribute("lon").Value, CultureInfo.InvariantCulture);
-                        var lastName = lastPoint.Element(ns + "name")?.Value;
-                        points.Add(new RoutePoint(points.Count + 1, new PointLatLng(lastLat, lastLon)) { Name = lastName });
+                        trkpt = trackPoints[trackPoints.Count - 1];
+                        point = CreateRoutePoint(trkpt.Attribute("lat").Value, trkpt.Attribute("lon").Value, points.Count + 1, trkpt.Element(ns + "name")?.Value);
+                        point.IsFinish = true;
+                        points.Add(point);
                     }
                     else
                     {
-                        foreach (var trkpt in trackPoints)
+                        foreach (var trkpt1 in trackPoints)
                         {
-                            var lat = double.Parse(trkpt.Attribute("lat").Value, CultureInfo.InvariantCulture);
-                            var lon = double.Parse(trkpt.Attribute("lon").Value, CultureInfo.InvariantCulture);
-                            var name = trkpt.Element(ns + "name")?.Value;
-
-                            var point = new RoutePoint(points.Count + 1, new PointLatLng(lat, lon))
-                            {
-                                Name = name
-                            };
-
+                            point = CreateRoutePoint(trkpt1.Attribute("lat").Value, trkpt1.Attribute("lon").Value, points.Count + 1, trkpt1.Element(ns + "name")?.Value);
                             points.Add(point);
+                        }
+                        if (point != null)
+                        {
+                            point.IsFinish = true;
                         }
                     }
                 }

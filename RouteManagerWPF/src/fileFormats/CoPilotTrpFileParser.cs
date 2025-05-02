@@ -12,6 +12,7 @@ namespace nl.siwoc.RouteManager.fileFormats
             var lines = File.ReadAllLines(filePath, encoding);
             var currentStop = new Dictionary<string, string>();
             string tripName = null;
+            RoutePoint point = null;
 
             foreach (var line in lines)
             {
@@ -31,7 +32,7 @@ namespace nl.siwoc.RouteManager.fileFormats
                         int.TryParse(latStr, out var lat))
                     {
                         var position = new PointLatLng(lat / 1000000.0, lon / 1000000.0);
-                        var point = new RoutePoint(points.Count + 1, position);
+                        point = new RoutePoint(points.Count + 1, position);
                         
                         if (currentStop.TryGetValue("Address", out var address))
                             point.Address = address;
@@ -62,6 +63,7 @@ namespace nl.siwoc.RouteManager.fileFormats
             {
                 throw new Exception("No valid points found in TRP file");
             }
+            point.IsFinish = true;
 
             return (points, tripName);
         }

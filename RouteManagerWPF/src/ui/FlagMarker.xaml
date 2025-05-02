@@ -3,9 +3,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="nl.siwoc.RouteManager.ui.FlagMarker"
     Height="50" Width="45" Opacity="10">
+    <UserControl.Resources>
+        <Style x:Key="Start" TargetType="Path">
+            <Setter Property="Fill" Value="SeaGreen" />
+        </Style>
+        <Style x:Key="Stop" TargetType="Path">
+            <Setter Property="Fill" Value="LightGoldenrodYellow" />
+        </Style>
+        <Style x:Key="RoutePoint" TargetType="Path">
+            <Setter Property="Fill" Value="SteelBlue" />
+        </Style>
+        <Style x:Key="Finish" TargetType="Path">
+            <Setter Property="Fill" Value="Firebrick" />
+        </Style>
+
+    </UserControl.Resources>
     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
         <Canvas Name="Flag" Width="85.483819" Height="94.561432">
-            <Path Name="FlagCloth" Fill="#FF00A7D8" StrokeThickness="0.26458332" Stroke="#FF000000" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
+            <Path Style="{StaticResource ResourceKey=RoutePoint}" Name="FlagCloth" StrokeThickness="0.26458332" Stroke="#FF000000" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
                 <Path.Data>
                     <PathGeometry Figures="M 0.32004224 0.22907964 C 51.460404 -1.2441388 38.239258 28.963823 84.283786 20.605822 56.957736 63.272153 27.018164 43.214683 0.32004224 65.116351 Z" FillRule="NonZero"/>
                 </Path.Data>

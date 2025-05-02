@@ -1,7 +1,6 @@
 # Project Tasks
 
 ## To Do
-- Styled flags for start stop end
 - cumulative duration to determine coffee and lunch stops
 - Implement file parsers based on file dialog box filter options
 - Add point from text
