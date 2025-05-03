@@ -33,7 +33,9 @@ namespace nl.siwoc.RouteManager.fileFormats
                     {
                         var position = new PointLatLng(lat / 1000000.0, lon / 1000000.0);
                         point = new RoutePoint(points.Count + 1, position);
-                        
+
+                        if (currentStop.TryGetValue("Name", out var name))
+                            point.Name = name;
                         if (currentStop.TryGetValue("Address", out var address))
                             point.Address = address;
                         if (currentStop.TryGetValue("City", out var city))
@@ -44,8 +46,6 @@ namespace nl.siwoc.RouteManager.fileFormats
                             point.Zip = zip;
                         if (currentStop.TryGetValue("Show", out var show))
                             point.IsStop = (show == "1");
-
-                        point.Name = point.Address;
 
                         points.Add(point);
                         currentStop.Clear();
@@ -95,10 +95,9 @@ namespace nl.siwoc.RouteManager.fileFormats
                     lines.Add($"Zip={point.Zip}");
                 if (!string.IsNullOrEmpty(point.City))
                     lines.Add($"City={point.City}");
-                // write name if available, otherwise write address
                 if (!string.IsNullOrEmpty(point.Name))
-                    lines.Add($"Address={point.Name}");
-                else if (!string.IsNullOrEmpty(point.Address))
+                    lines.Add($"Name={point.Name}");
+                if (!string.IsNullOrEmpty(point.Address))
                     lines.Add($"Address={point.Address}");
                 lines.Add($"Show={(point.IsStop ? "1" : "0")}");
                 lines.Add("End Stop");

@@ -304,8 +304,7 @@ namespace nl.siwoc.RouteManager.ui
         private void RoutePoint_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // Don't mark as dirty for calculated fields
-            if (e.PropertyName != nameof(RoutePoint.DisplayText) && 
-                e.PropertyName != nameof(RoutePoint.CumulativeDistance) &&
+            if (e.PropertyName != nameof(RoutePoint.CumulativeDistance) &&
                 e.PropertyName != nameof(RoutePoint.CumulativeDuration))
             {
                 IsDirty = true;

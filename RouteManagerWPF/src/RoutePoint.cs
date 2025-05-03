@@ -216,8 +216,11 @@ namespace nl.siwoc.RouteManager
         {
             get
             {
-                var addressText = string.Join(", ", new[] { Address, City }.Where(s => !string.IsNullOrEmpty(s)));
-                return !string.IsNullOrEmpty(addressText) ? addressText : Name;
+                if (Name != null && !Name.Equals(Address)) {
+                    return Name;
+                } else {
+                    return string.Join(", ", new[] { City, Address }.Where(s => !string.IsNullOrEmpty(s)));
+                }
             }
         }
 

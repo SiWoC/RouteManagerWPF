@@ -65,6 +65,7 @@
 
         <!-- Main Content -->
         <Grid>
+            <!-- Left to right division -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="700*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -110,14 +111,12 @@
                          HorizontalAlignment="Center" 
                          VerticalAlignment="Stretch"/>
 
-            <!-- Route Details -->
+            <!-- Right side, Text details -->
             <Grid Grid.Column="2" Margin="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
 
                 <!-- Route Details -->
