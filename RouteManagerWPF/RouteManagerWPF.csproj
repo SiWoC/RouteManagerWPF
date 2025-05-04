@@ -7,12 +7,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyName>RouteManager</AssemblyName>
-    <Version>0.7.0</Version>
+    <Version>0.9.1</Version>
     <Authors>SiWoC</Authors>
     <Company>SiWoC</Company>
     <Product>Route Manager</Product>
     <Description>A WPF application for managing routes using GMap.NET</Description>
-    <Copyright>Copyright © 2025</Copyright>
+    <Copyright>Copyright SiWoC © 2025</Copyright>
     <ApplicationIcon>resources\nl\siwoc\RouteManager\ui\app.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
