@@ -8,6 +8,13 @@
         Title="Route Manager" Height="1000" Width="1600"
         WindowStartupLocation="CenterScreen">
 
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewRouteCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveRouteCommand}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenRouteCommand}"/>
+        <KeyBinding Key="F" Modifiers="Control" Command="{Binding FitToRouteCommand}"/>
+    </Window.InputBindings>
+
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="8,4"/>
