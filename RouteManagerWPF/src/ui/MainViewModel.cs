@@ -11,6 +11,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using nl.siwoc.RouteManager.fileFormats;
 using System.Windows.Threading;
+using System.Collections.Generic;
+using System.IO;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -363,7 +365,7 @@ namespace nl.siwoc.RouteManager.ui
 
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
+                Filter = GetFileFilter(),
                 DefaultExt = ".trp"
             };
 
@@ -374,15 +376,7 @@ namespace nl.siwoc.RouteManager.ui
                     // Temporarily disable CollectionChanged events
                     routePoints.CollectionChanged -= RoutePoints_CollectionChanged;
 
-                    IFileParser parser;
-                    if (dialog.FileName.EndsWith(".gpx", StringComparison.OrdinalIgnoreCase))
-                    {
-                        parser = new GpxFileParser();
-                    }
-                    else
-                    {
-                        parser = new CoPilotTrpFileParser();
-                    }
+                    IFileParser parser = GetParserForFile(dialog.FileName);
                     var (points, routeName) = parser.Read(dialog.FileName);
                     
                     // Clear all markers and points
@@ -420,6 +414,50 @@ namespace nl.siwoc.RouteManager.ui
             }
         }
 
+        private string GetFileFilter()
+        {
+            var allExtensions = new List<string>();
+            var allFilters = new List<string>();
+            
+            foreach (var parser in GetParsers())
+            {
+                var extensions = parser.SupportedFileTypes;
+                var filter = $"{GetParserName(parser)} files|{string.Join(";", extensions.Select(e => $"*{e}"))}";
+                allExtensions.AddRange(extensions);
+                allFilters.Add(filter);
+            }
+            
+            allFilters.Insert(0, $"All supported files|{string.Join(";", allExtensions.Select(e => $"*{e}"))}");
+            allFilters.Add("All files|*.*");
+            
+            return string.Join("|", allFilters);
+        }
+
+        private string GetParserName(IFileParser parser)
+        {
+            return parser switch
+            {
+                GpxFileParser => "GPX",
+                CoPilotTrpFileParser => "CoPilot TRP",
+                VcfFileParser => "VCF",
+                _ => parser.GetType().Name.Replace("FileParser", "")
+            };
+        }
+
+        private IFileParser GetParserForFile(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            return GetParsers().FirstOrDefault(p => p.SupportedFileTypes.Contains(extension)) 
+                ?? throw new Exception($"No parser found for file extension {extension}");
+        }
+
+        private IEnumerable<IFileParser> GetParsers()
+        {
+            yield return new GpxFileParser();
+            yield return new CoPilotTrpFileParser();
+            yield return new VcfFileParser();
+        }
+
         private void ExecuteSaveRoute()
         {
             if (RoutePoints.Count == 0)
@@ -430,7 +468,7 @@ namespace nl.siwoc.RouteManager.ui
 
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
-                Filter = "All supported files|*.trp;*.gpx|CoPilot TRP files|*.trp|GPX files|*.gpx|All files|*.*",
+                Filter = GetFileFilter(),
                 DefaultExt = ".trp",
                 FileName = CurrentFileName
             };
@@ -439,15 +477,7 @@ namespace nl.siwoc.RouteManager.ui
             {
                 try
                 {
-                    IFileParser parser;
-                    if (dialog.FileName.EndsWith(".gpx", StringComparison.OrdinalIgnoreCase))
-                    {
-                        parser = new GpxFileParser();
-                    }
-                    else
-                    {
-                        parser = new CoPilotTrpFileParser();
-                    }
+                    var parser = GetParserForFile(dialog.FileName);
                     parser.Write(dialog.FileName, RoutePoints.ToList(), RouteName);
                     CurrentFileName = dialog.FileName;
                     IsDirty = false;

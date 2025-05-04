@@ -199,7 +199,7 @@ namespace nl.siwoc.RouteManager
             var value = key?.GetValue(StartLatitudeKey)?.ToString();
             var result = value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed) 
                 ? parsed 
-                : 46.538615; // Default latitude
+                : 46.52862; // Default latitude
             cachedStartLatitude = result;
             return result;
         }
@@ -213,7 +213,7 @@ namespace nl.siwoc.RouteManager
             var value = key?.GetValue(StartLongitudeKey)?.ToString();
             var result = value != null && double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed) 
                 ? parsed 
-                : 10.501385; // Default longitude
+                : 10.45320; // Default longitude
             cachedStartLongitude = result;
             return result;
         }

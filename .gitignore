@@ -482,3 +482,4 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+RouteManagerWPF.Tests/testdata/out/*

@@ -10,6 +10,8 @@ namespace nl.siwoc.RouteManager.fileFormats
 {
     public class GpxFileParser : IFileParser
     {
+        public string[] SupportedFileTypes => new[] { ".gpx" };
+
         private const string GpxNamespace10 = "http://www.topografix.com/GPX/1/0";
         private const string GpxNamespace11 = "http://www.topografix.com/GPX/1/1";
 
@@ -122,7 +124,7 @@ namespace nl.siwoc.RouteManager.fileFormats
 
         private RoutePoint CreateRoutePoint(string lat,string lon, int index, string name)
         {
-            var point = new RoutePoint(index, new PointLatLng(DegreeFromString(lat), DegreeFromString(lon)))
+            var point = new RoutePoint(index, new PointLatLng(FileUtils.ParseDouble(lat), FileUtils.ParseDouble(lon)))
             {
                 Name = name
             };
@@ -201,8 +203,8 @@ namespace nl.siwoc.RouteManager.fileFormats
                     new XElement(XNamespace.Get(ns) + "rte",
                         new XElement(XNamespace.Get(ns) + "name", routeName ?? GetFileNameWithoutExtension(filePath)),
                         points.Select(p => new XElement(XNamespace.Get(ns) + "rtept",
-                            new XAttribute("lat", p.Position.Lat.ToString(CultureInfo.InvariantCulture)),
-                            new XAttribute("lon", p.Position.Lng.ToString(CultureInfo.InvariantCulture)),
+                            new XAttribute("lat", FileUtils.FormatDouble(p.Position.Lat)),
+                            new XAttribute("lon", FileUtils.FormatDouble(p.Position.Lng)),
                             !string.IsNullOrEmpty(p.Name) ? new XElement(XNamespace.Get(ns) + "name", p.Name) : null
                         ))
                     )
@@ -215,10 +217,5 @@ namespace nl.siwoc.RouteManager.fileFormats
             }
         }
 
-        private double DegreeFromString(string str)
-        {
-            return double.Parse(str, CultureInfo.InvariantCulture);
-        }
-    
     }
 } 

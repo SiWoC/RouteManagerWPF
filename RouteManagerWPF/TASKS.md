@@ -1,7 +1,11 @@
 # Project Tasks
 
 ## To Do
-- Implement save as vcf for my VW RNS510
-- Implement file parsers based on file dialog box filter options
+- highlight flag when selected (zindex + style?)
+- getRoute async
+- add IsStop in gpx extension
+- dragflag, don't calculate complete route but show changing segment in red till after drop
+- Implement file parsers more dynamically
+- Implement routing profiles to support Bike... I'm not using that
 
 

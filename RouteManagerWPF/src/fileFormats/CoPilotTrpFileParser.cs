@@ -5,6 +5,8 @@ namespace nl.siwoc.RouteManager.fileFormats
 {
     public class CoPilotTrpFileParser : IFileParser
     {
+        public string[] SupportedFileTypes => new[] { ".trp" };
+
         public (List<RoutePoint> Points, string RouteName) Read(string filePath)
         {
             var points = new List<RoutePoint>();
