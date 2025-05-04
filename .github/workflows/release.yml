@@ -18,19 +18,19 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore RouteManagerWPF.sln
       
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build RouteManagerWPF.sln --configuration Release --no-restore
       
     - name: Publish
-      run: dotnet publish RouteManagerWPF/RouteManagerWPF/RouteManagerWPF.csproj -c Release -r win-x64 --self-contained false
+      run: dotnet publish RouteManagerWPF.sln -c Release -r win-x64 --self-contained false
       
     - name: Create Release Package
       run: |
         $releaseDir = "release"
         New-Item -ItemType Directory -Path $releaseDir
-        Copy-Item "RouteManagerWPF/RouteManagerWPF/bin/Release/net8.0-windows/win-x64/publish/*" -Exclude "*.pdb" $releaseDir
+        Copy-Item "RouteManagerWPF/bin/Release/net8.0-windows/win-x64/publish/*" -Exclude "*.pdb" $releaseDir
         Compress-Archive -Path $releaseDir/* -DestinationPath "RouteManager.zip" -Force
         
     - name: Create Release
