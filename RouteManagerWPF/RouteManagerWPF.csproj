@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyName>RouteManager</AssemblyName>
     <Version>0.7.0</Version>
     <Authors>SiWoC</Authors>
     <Company>SiWoC</Company>

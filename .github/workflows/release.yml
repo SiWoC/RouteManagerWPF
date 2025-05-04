@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Publish
+      run: dotnet publish RouteManagerWPF/RouteManagerWPF/RouteManagerWPF.csproj -c Release -r win-x64 --self-contained false
+      
+    - name: Create Release Package
+      run: |
+        $releaseDir = "release"
+        New-Item -ItemType Directory -Path $releaseDir
+        Copy-Item "RouteManagerWPF/RouteManagerWPF/bin/Release/net8.0-windows/win-x64/publish/*" -Exclude "*.pdb" $releaseDir
+        Compress-Archive -Path $releaseDir/* -DestinationPath "RouteManager.zip" -Force
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: RouteManager.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
