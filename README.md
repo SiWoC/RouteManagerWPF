@@ -23,7 +23,7 @@ A Windows desktop application for building and converting routes for Road Trips.
 ## Requirements
 
 - Windows 10 or later
-- .NET 6.0 or later. When you first run the program, a Microsoft poput might prompt you to download and install this.
+- .NET 8.0 or later. When you first run the program, a Microsoft popup might prompt you to download and install this.
 - Google Maps API key (optional, for Google Maps provider)
 
 ## Installation

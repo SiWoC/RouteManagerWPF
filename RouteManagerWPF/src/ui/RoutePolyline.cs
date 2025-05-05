@@ -2,9 +2,8 @@ using GMap.NET;
 using GMap.NET.WindowsPresentation;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using GMap.NET.MapProviders;
-using nl.siwoc.RouteManager;
 using System.Globalization;
+using System.Windows;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -18,7 +17,7 @@ namespace nl.siwoc.RouteManager.ui
             this.mapControl = mapControl;
         }
 
-        public (double distance, double duration) UpdateRoute(IEnumerable<RoutePoint> points)
+        public async Task<(double distance, double duration)> UpdateRoute(IEnumerable<RoutePoint> points)
         {
             double totalDistance = 0;
             double totalDuration = 0;
@@ -27,7 +26,9 @@ namespace nl.siwoc.RouteManager.ui
             {
                 if (gmapRoute != null)
                 {
-                    mapControl.Markers.Remove(gmapRoute);
+                    await Application.Current.Dispatcher.InvokeAsync(() => {
+                        mapControl.Markers.Remove(gmapRoute);
+                    });
                     gmapRoute = null;
                 }
                 return (totalDistance, totalDuration);
@@ -40,7 +41,8 @@ namespace nl.siwoc.RouteManager.ui
                 var start = pointList[i].Position;
                 var end = pointList[i + 1].Position;
                 
-                MapRoute mapRoute = Settings.LoadRoutingProvider().GetRoute(start, end, false, false, (int)mapControl.Zoom);
+                var zoom = await Application.Current.Dispatcher.InvokeAsync(() => (int)mapControl.Zoom);
+                MapRoute mapRoute = await Task.Run(() => Settings.LoadRoutingProvider().GetRoute(start, end, false, false, zoom));
                 if (mapRoute != null)
                 {
                     allPoints.AddRange(mapRoute.Points);
@@ -53,18 +55,20 @@ namespace nl.siwoc.RouteManager.ui
 
             if (allPoints.Count > 0)
             {
-                if (gmapRoute != null)
-                {
-                    mapControl.Markers.Remove(gmapRoute);
-                }
-                gmapRoute = new GMapRoute(allPoints);
-                gmapRoute.Shape = new Path
-                {
-                    Stroke = Brushes.Blue,
-                    StrokeThickness = 4,
-                    Opacity = 0.7
-                };
-                mapControl.Markers.Add(gmapRoute);
+                await Application.Current.Dispatcher.InvokeAsync(() => {
+                    if (gmapRoute != null)
+                    {
+                        mapControl.Markers.Remove(gmapRoute);
+                    }
+                    gmapRoute = new GMapRoute(allPoints);
+                    gmapRoute.Shape = new Path
+                    {
+                        Stroke = Brushes.Blue,
+                        StrokeThickness = 4,
+                        Opacity = 0.7
+                    };
+                    mapControl.Markers.Add(gmapRoute);
+                });
             }
 
             return (totalDistance, totalDuration);

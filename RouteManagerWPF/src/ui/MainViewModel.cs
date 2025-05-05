@@ -237,11 +237,11 @@ namespace nl.siwoc.RouteManager.ui
             // Initialize debounce timer
             updateRouteTimer = new DispatcherTimer();
             updateRouteTimer.Interval = TimeSpan.FromMilliseconds(500);
-            updateRouteTimer.Tick += (s, e) => {
+            updateRouteTimer.Tick += async (s, e) => {
                 if (routeUpdatePending)
                 {
                     routeUpdatePending = false;
-                    var (distance, duration) = routePolyline.UpdateRoute(RoutePoints);
+                    var (distance, duration) = await routePolyline.UpdateRoute(RoutePoints);
                     RouteDistance = distance;
                     RouteDuration = Utils.ConvertRouteDuration(duration);
                 }
