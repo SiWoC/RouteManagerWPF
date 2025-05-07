@@ -2,6 +2,7 @@ using System.Windows;
 using GMap.NET;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace nl.siwoc.RouteManager.ui
 {
@@ -41,11 +42,14 @@ namespace nl.siwoc.RouteManager.ui
 
         public void ScrollToSelectedPoint()
         {
-            if (RoutePointsDataGrid.SelectedItem != null)
-            {
-                RoutePointsDataGrid.ScrollIntoView(RoutePointsDataGrid.SelectedItem);
-                RoutePointsDataGrid.Focus();
-            }
+            // don't scroll to previous point, wait for the new point to be selected
+            Dispatcher.BeginInvoke(new Action(() => {
+                if (RoutePointsDataGrid.SelectedItem != null)
+                {
+                    RoutePointsDataGrid.ScrollIntoView(RoutePointsDataGrid.SelectedItem);
+                    RoutePointsDataGrid.Focus();
+                }
+            }));
         }
     }
 } 

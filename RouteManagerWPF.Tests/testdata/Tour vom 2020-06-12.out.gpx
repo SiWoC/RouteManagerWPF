@@ -5,9 +5,11 @@
   </metadata>
   <rte>
     <name>Tour vom 2020-06-12</name>
-    <rtept lat="52.349891" lon="8.230268" />
+    <rtept lat="52.380720" lon="8.196980">
+      <name>Wahlburgstraße 4</name>
+    </rtept>
     <rtept lat="52.348142" lon="8.250252" />
-    <rtept lat="52.335727" lon="8.28729" />
+    <rtept lat="52.335727" lon="8.287290" />
     <rtept lat="52.325035" lon="8.313516" />
     <rtept lat="52.316108" lon="8.334551" />
     <rtept lat="52.302221" lon="8.327076" />
@@ -15,11 +17,11 @@
     <rtept lat="52.256686" lon="8.312871" />
     <rtept lat="52.240637" lon="8.314117" />
     <rtept lat="52.222664" lon="8.316302" />
-    <rtept lat="52.20908" lon="8.329942" />
+    <rtept lat="52.209080" lon="8.329942" />
     <rtept lat="52.200105" lon="8.342586" />
     <rtept lat="52.191145" lon="8.353038" />
     <rtept lat="52.186165" lon="8.381372" />
-    <rtept lat="52.1807" lon="8.417621" />
+    <rtept lat="52.180700" lon="8.417621" />
     <rtept lat="52.178758" lon="8.450351" />
     <rtept lat="52.167696" lon="8.487986" />
     <rtept lat="52.155804" lon="8.509746" />
@@ -28,8 +30,7 @@
     <rtept lat="52.136084" lon="8.579714" />
     <rtept lat="52.132908" lon="8.617151" />
     <rtept lat="52.122805" lon="8.640164" />
-    <rtept lat="52.117203" lon="8.66461" />
-    <rtept lat="52.120442" lon="8.688649" />
+    <rtept lat="52.117203" lon="8.664610" />
     <rtept lat="52.124017" lon="8.718549" />
     <rtept lat="52.134273" lon="8.745149" />
     <rtept lat="52.139092" lon="8.781274" />
@@ -67,7 +68,7 @@
     <rtept lat="51.910058" lon="8.912029" />
     <rtept lat="51.896486" lon="8.902032" />
     <rtept lat="51.876162" lon="8.913226" />
-    <rtept lat="51.87142" lon="8.928743" />
+    <rtept lat="51.871420" lon="8.928743" />
     <rtept lat="51.873861" lon="8.919525" />
     <rtept lat="51.894998" lon="8.902582" />
     <rtept lat="51.911933" lon="8.874323" />
@@ -75,22 +76,26 @@
     <rtept lat="51.924087" lon="8.826866" />
     <rtept lat="51.930338" lon="8.803933" />
     <rtept lat="51.942733" lon="8.795777" />
-    <rtept lat="51.95156" lon="8.770231" />
+    <rtept lat="51.951560" lon="8.770231" />
     <rtept lat="51.969321" lon="8.734772" />
     <rtept lat="51.982002" lon="8.716426" />
     <rtept lat="51.998294" lon="8.712009" />
     <rtept lat="52.004461" lon="8.677734" />
     <rtept lat="52.010827" lon="8.635573" />
     <rtept lat="52.028228" lon="8.623347" />
-    <rtept lat="52.040338" lon="8.60037" />
+    <rtept lat="52.040338" lon="8.600370" />
     <rtept lat="52.049792" lon="8.584708" />
     <rtept lat="52.055703" lon="8.559027" />
     <rtept lat="52.057263" lon="8.533381" />
-    <rtept lat="52.059491" lon="8.50553" />
-    <rtept lat="52.07071" lon="8.489795" />
+    <rtept lat="52.059491" lon="8.505530" />
+    <rtept lat="52.070710" lon="8.489795" />
     <rtept lat="52.080082" lon="8.454528" />
-    <rtept lat="52.082206" lon="8.424193" />
-    <rtept lat="52.095206" lon="8.449128" />
+    <rtept lat="51.925750" lon="8.200540">
+      <name>Birkenvenn 13</name>
+    </rtept>
+    <rtept lat="52.047690" lon="8.105200">
+      <name>Am Sandbrink 10</name>
+    </rtept>
     <rtept lat="52.113295" lon="8.434782" />
     <rtept lat="52.127795" lon="8.415257" />
     <rtept lat="52.136766" lon="8.389281" />
@@ -103,9 +108,14 @@
     <rtept lat="52.245003" lon="8.278783" />
     <rtept lat="52.257418" lon="8.254037" />
     <rtept lat="52.279817" lon="8.240146" />
-    <rtept lat="52.304265" lon="8.225157" />
-    <rtept lat="52.334981" lon="8.215775" />
-    <rtept lat="52.349598" lon="8.2312" />
-    <rtept lat="52.349661" lon="8.231048" />
+    <rtept lat="52.274420" lon="8.174600">
+      <name>Ginsterweg</name>
+    </rtept>
+    <rtept lat="52.298190" lon="8.151450">
+      <name>Auf der Egge 12</name>
+    </rtept>
+    <rtept lat="52.339290" lon="8.105390">
+      <name>Lechtinger Straße</name>
+    </rtept>
   </rte>
 </gpx>

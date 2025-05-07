@@ -138,7 +138,15 @@ namespace nl.siwoc.RouteManager.ui
             {
                 if (selectedPoint != value)
                 {
+                    if (selectedPoint != null)
+                    {
+                        selectedPoint.IsSelected = false;
+                    }
                     selectedPoint = value;
+                    if (value != null)
+                    {
+                        value.IsSelected = true;
+                    }
                     OnPropertyChanged();
                     if (Application.Current.MainWindow is MainWindow mainWindow)
                     {

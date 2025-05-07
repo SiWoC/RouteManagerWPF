@@ -4,6 +4,25 @@
     x:Class="nl.siwoc.RouteManager.ui.FlagMarker"
     Height="50" Width="45" Opacity="10">
     <UserControl.Resources>
+        <Storyboard x:Key="MarchingAnts">
+            <DoubleAnimation BeginTime="00:00:00"
+                                Storyboard.TargetName="Pole"
+                                Storyboard.TargetProperty="StrokeThickness"
+                                To="4"
+                                Duration="0:0:0.25" />
+            <!-- If you want to run counter-clockwise, just swap the 'From' and 'To' values. -->
+            <DoubleAnimation BeginTime="00:00:00" RepeatBehavior="Forever" Storyboard.TargetName="Pole" Storyboard.TargetProperty="StrokeDashOffset" 
+                                Duration="0:3:0" From="1000" To="0"/>
+        </Storyboard>
+
+        <Style x:Key="SelectedCloth" TargetType="Path">
+            <Setter Property="Fill" Value="Gold" />
+        </Style>
+        <Style x:Key="SelectedPole" TargetType="Path">
+            <Setter Property="Fill" Value="Gold" />
+            <Setter Property="StrokeDashArray" Value="2,2" />
+            <Setter Property="StrokeDashOffset" Value="0" />
+        </Style>
         <Style x:Key="Start" TargetType="Path">
             <Setter Property="Fill" Value="SeaGreen" />
         </Style>
@@ -18,14 +37,21 @@
         </Style>
 
     </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource MarchingAnts}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+    
     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
         <Canvas Name="Flag" Width="85.483819" Height="94.561432">
-            <Path Style="{StaticResource ResourceKey=RoutePoint}" Name="FlagCloth" StrokeThickness="0.26458332" Stroke="#FF000000" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
+            <Path Name="FlagCloth" Style="{StaticResource ResourceKey=SelectedCloth}" StrokeThickness="1.0" Stroke="#FF000000" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
                 <Path.Data>
                     <PathGeometry Figures="M 0.32004224 0.22907964 C 51.460404 -1.2441388 38.239258 28.963823 84.283786 20.605822 56.957736 63.272153 27.018164 43.214683 0.32004224 65.116351 Z" FillRule="NonZero"/>
                 </Path.Data>
             </Path>
-            <Path Name="Pole" Fill="#FF000000" StrokeThickness="1.98726213" Stroke="#FF000000" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
+            <Path Name="Pole" Style="{StaticResource ResourceKey=SelectedPole}" Fill="#FF000000" StrokeThickness="3.0" Stroke="#FF000000" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat">
                 <Path.Data>
                     <PathGeometry Figures="M 0.0 -2.0 V 94.571212 l -0.01498 0.13822" FillRule="NonZero"/>
                 </Path.Data>

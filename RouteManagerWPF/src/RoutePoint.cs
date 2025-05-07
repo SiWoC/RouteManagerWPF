@@ -22,6 +22,7 @@ namespace nl.siwoc.RouteManager
         private string address;
         private bool isStop;
         private bool isFinish;
+        private bool isSelected;
         private double cumulativeDistance;
         private string cumulativeDuration;
         public GMapMarker Marker { get; private set; }
@@ -184,6 +185,18 @@ namespace nl.siwoc.RouteManager
             } 
         }
 
+        public bool IsSelected
+        {
+            get => isSelected;
+            set { 
+                if (isSelected != value)
+                {
+                    isSelected = value;
+                    UpdateStyle();
+                }
+            }
+        }
+
         public MapControlWrapper MapControl
         {
             get => mapControl;
@@ -205,7 +218,6 @@ namespace nl.siwoc.RouteManager
                         Marker = new GMapMarker(Position);
                         var flagMarker = new FlagMarker(mapControl, Marker, Index);
                         Marker.Shape = flagMarker;
-                        Marker.ZIndex = 100;
                         mapControl.Markers.Add(Marker);
                     }
                 }
@@ -267,7 +279,11 @@ namespace nl.siwoc.RouteManager
         {
             if (Marker?.Shape is FlagMarker flagMarker)
             {
-                if (index == 1)
+                if (isSelected)
+                {
+                    flagMarker.SetStyle(FlagMarker.FlagStyle.Selected);
+                }
+                else if (index == 1)
                 {
                     flagMarker.SetStyle(FlagMarker.FlagStyle.Start);
                 }

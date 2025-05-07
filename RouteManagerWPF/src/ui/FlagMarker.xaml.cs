@@ -10,7 +10,7 @@ namespace nl.siwoc.RouteManager.ui
 {
     public partial class FlagMarker
     {
-        public enum FlagStyle { Start, Stop, RoutePoint, Finish }
+        public enum FlagStyle { Start, Stop, RoutePoint, Finish, Selected }
 
         private GMapMarker _marker;
         private MapControlWrapper mapControl;
@@ -30,7 +30,18 @@ namespace nl.siwoc.RouteManager.ui
 
         public void SetStyle(FlagStyle style) 
         {
-            FlagCloth.Style = (Style)Resources[style.ToString()];
+            if (style == FlagStyle.Selected)
+            {
+                FlagCloth.Style = (Style)Resources["SelectedCloth"];
+                Pole.Style = (Style)Resources["SelectedPole"];
+                _marker.ZIndex = 200;
+            }
+            else
+            {
+                FlagCloth.Style = (Style)Resources[style.ToString()];
+                Pole.Style = (Style)Resources[style.ToString()];
+                _marker.ZIndex = 100;
+            }
         }
 
         public FlagMarker(MapControlWrapper mapControl, GMapMarker marker, int index)
@@ -39,6 +50,7 @@ namespace nl.siwoc.RouteManager.ui
 
             this.mapControl = mapControl;
             _marker = marker;
+            _marker.ZIndex = 100;
             Index = index;
 
             // Set the marker offset to position the flag above its point
