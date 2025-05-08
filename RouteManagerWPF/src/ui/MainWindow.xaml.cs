@@ -40,6 +40,25 @@ namespace nl.siwoc.RouteManager.ui
             ViewModel.RoutePointsDataGrid_HandleDragOver(e);
         }
 
+        // selecting next/prev row with arrow keys
+        // and prevent arrow keys from navigating outside the datagrid
+        private void RoutePointsDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                e.Handled = true;
+                var grid = (DataGrid)sender;
+                var currentIndex = grid.SelectedIndex;
+                var newIndex = e.Key == Key.Up ? currentIndex - 1 : currentIndex + 1;
+
+                if (newIndex >= 0 && newIndex < grid.Items.Count)
+                {
+                    grid.SelectedIndex = newIndex;
+                    grid.ScrollIntoView(grid.Items[newIndex]);
+                }
+            }
+        }
+
         public void ScrollToSelectedPoint()
         {
             // don't scroll to previous point, wait for the new point to be selected

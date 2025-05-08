@@ -29,6 +29,10 @@
             <Setter Property="Margin" Value="4"/>
         </Style>
 
+        <Style TargetType="DataGridCell">
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+
         <local:InstanceToBooleanConverter x:Key="InstanceToBooleanConverter"/>
     </Window.Resources>
 
@@ -204,15 +208,13 @@
                               ItemsSource="{Binding RoutePoints}"
                               SelectedItem="{Binding SelectedPoint}"
                               AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="True"
-                              SelectionMode="Single"
-                              CanUserReorderColumns="False"
                               CanUserSortColumns="False"
-                              AllowDrop="True"
                               PreviewMouseLeftButtonDown="RoutePointsDataGrid_PreviewMouseLeftButtonDown"
+                              PreviewKeyDown="RoutePointsDataGrid_PreviewKeyDown"
+                              AllowDrop="True"
                               Drop="RoutePointsDataGrid_Drop"
-                              DragOver="RoutePointsDataGrid_DragOver">
+                              DragOver="RoutePointsDataGrid_DragOver"
+                              IsReadOnly="True">
                         <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Delete Point" 
