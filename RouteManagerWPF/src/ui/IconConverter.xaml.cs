@@ -57,7 +57,7 @@ namespace nl.siwoc.RouteManager
                     }
 
                     // Create ICO file
-                    var outputIcoPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources", "nl", "siwoc", "RouteManager", "ui", "app.ico");
+                    var outputIcoPath = Path.Combine(AppContext.BaseDirectory, "resources", "nl", "siwoc", "RouteManager", "ui", "app.ico");
                     using (var stream2 = File.Create(outputIcoPath))
                     using (var writer = new BinaryWriter(stream2))
                     {
