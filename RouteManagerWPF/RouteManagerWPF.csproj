@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyName>RouteManager</AssemblyName>
-    <Version>0.9.1</Version>
+    <Version>1.0.0</Version>
     <Authors>SiWoC</Authors>
     <Company>SiWoC</Company>
     <Product>Route Manager</Product>
