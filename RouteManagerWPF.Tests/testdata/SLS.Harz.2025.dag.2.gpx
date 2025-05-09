@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx version="1.1" creator="RouteManager (https://github.com/SiWoC/RouteManagerWPF)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:srm="https://github.com/SiWoC/RouteManagerWPF/gpx/1.0" xmlns:schemaLocation="http://www.topografix.com/GPX/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>SLS Harz 2025 dag 2</name>
+  </metadata>
+  <wpt lat="51.627930" lon="10.383050">
+    <name>Hotel Harzer Hof</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.649290" lon="10.346670">
+    <name>Tanken Aral</name>
+    <extensions>
+      <srm:isstop>true</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.757610" lon="10.304320">
+    <name>K26 54</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.804410" lon="10.330780">
+    <name>B242 13</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.818490" lon="10.277270">
+    <name>L515</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.866930" lon="10.289670">
+    <name>Hahnenkleer Straße 34</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.847810" lon="10.355330">
+    <name>B241</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.901390" lon="10.425290">
+    <name>Kaisertorstraße 4</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.901180" lon="10.482240">
+    <name>B498 18</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.773120" lon="10.428070">
+    <name>B242</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.736450" lon="10.602960">
+    <name>K68</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.750500" lon="10.684890">
+    <name>L99</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.765340" lon="10.656420">
+    <name>Koffie Café Zum Brockenbäcker</name>
+    <extensions>
+      <srm:isstop>true</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.816260" lon="10.738750">
+    <name>Drängetal 6</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.839160" lon="10.829420">
+    <name>Benzingeröder Chaussee</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.815700" lon="10.894570">
+    <name>K1347</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.768850" lon="10.810840">
+    <name>Altes Mühlental 10C</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.755470" lon="10.846600">
+    <name>Blankenburger Straße 26</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.764750" lon="10.903960">
+    <name>Altenbraker Straße 9</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.748760" lon="10.935200">
+    <name>B81</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.764040" lon="10.970330">
+    <name>Harzstraße 38</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.715080" lon="10.976140">
+    <name>Ortsstraße 25 b</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.645860" lon="10.990550">
+    <name>Armborst 155C</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.610380" lon="11.046800">
+    <name>Stadtweg 216</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.561950" lon="10.956970">
+    <name>Thyratal 9A</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.493110" lon="10.974040">
+    <name>Lunch Thyra Fuchs</name>
+    <extensions>
+      <srm:isstop>true</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.525980" lon="10.935560">
+    <name>L237</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.542750" lon="10.857940">
+    <name>L1037</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.587390" lon="10.784560">
+    <name>Ilfelder Tal 1A</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.638260" lon="10.708410">
+    <name>B4</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.685340" lon="10.659960">
+    <name>B4</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.681370" lon="10.605480">
+    <name>L601</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.597580" lon="10.595690">
+    <name>L604</name>
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.584340" lon="10.512350">
+    <extensions>
+      <srm:isstop>false</srm:isstop>
+    </extensions>
+  </wpt>
+  <wpt lat="51.627980" lon="10.383700">
+    <name>Hotel Harzer Hof</name>
+    <extensions>
+      <srm:isstop>true</srm:isstop>
+    </extensions>
+  </wpt>
+  <rte>
+    <name>SLS Harz 2025 dag 2</name>
+    <rtept lat="51.627930" lon="10.383050">
+      <name>Hotel Harzer Hof</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.649290" lon="10.346670">
+      <name>Tanken Aral</name>
+      <extensions>
+        <srm:isstop>true</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.757610" lon="10.304320">
+      <name>K26 54</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.804410" lon="10.330780">
+      <name>B242 13</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.818490" lon="10.277270">
+      <name>L515</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.866930" lon="10.289670">
+      <name>Hahnenkleer Straße 34</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.847810" lon="10.355330">
+      <name>B241</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.901390" lon="10.425290">
+      <name>Kaisertorstraße 4</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.901180" lon="10.482240">
+      <name>B498 18</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.773120" lon="10.428070">
+      <name>B242</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.736450" lon="10.602960">
+      <name>K68</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.750500" lon="10.684890">
+      <name>L99</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.765340" lon="10.656420">
+      <name>Koffie Café Zum Brockenbäcker</name>
+      <extensions>
+        <srm:isstop>true</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.816260" lon="10.738750">
+      <name>Drängetal 6</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.839160" lon="10.829420">
+      <name>Benzingeröder Chaussee</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.815700" lon="10.894570">
+      <name>K1347</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.768850" lon="10.810840">
+      <name>Altes Mühlental 10C</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.755470" lon="10.846600">
+      <name>Blankenburger Straße 26</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.764750" lon="10.903960">
+      <name>Altenbraker Straße 9</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.748760" lon="10.935200">
+      <name>B81</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.764040" lon="10.970330">
+      <name>Harzstraße 38</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.715080" lon="10.976140">
+      <name>Ortsstraße 25 b</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.645860" lon="10.990550">
+      <name>Armborst 155C</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.610380" lon="11.046800">
+      <name>Stadtweg 216</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.561950" lon="10.956970">
+      <name>Thyratal 9A</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.493110" lon="10.974040">
+      <name>Lunch Thyra Fuchs</name>
+      <extensions>
+        <srm:isstop>true</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.525980" lon="10.935560">
+      <name>L237</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.542750" lon="10.857940">
+      <name>L1037</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.587390" lon="10.784560">
+      <name>Ilfelder Tal 1A</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.638260" lon="10.708410">
+      <name>B4</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.685340" lon="10.659960">
+      <name>B4</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.681370" lon="10.605480">
+      <name>L601</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.597580" lon="10.595690">
+      <name>L604</name>
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.584340" lon="10.512350">
+      <extensions>
+        <srm:isstop>false</srm:isstop>
+      </extensions>
+    </rtept>
+    <rtept lat="51.627980" lon="10.383700">
+      <name>Hotel Harzer Hof</name>
+      <extensions>
+        <srm:isstop>true</srm:isstop>
+      </extensions>
+    </rtept>
+  </rte>
+</gpx>

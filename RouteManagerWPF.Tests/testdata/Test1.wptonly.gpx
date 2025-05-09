@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx version="1.1" creator="RouteManager (https://github.com/SiWoC/RouteManagerWPF)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Test1</name>
+  </metadata>
+	<wpt lat="50.451688" lon="8.029562">
+	  <name>The Start</name>
+	</wpt>
+	<wpt lat="50.447725" lon="8.068956" />
+	<wpt lat="50.460410" lon="8.090680">
+	  <name>Am Holzbach 3</name>
+	</wpt>
+	<wpt lat="50.462440" lon="8.055320">
+	  <name>The Finish</name>
+	</wpt>
+</gpx>

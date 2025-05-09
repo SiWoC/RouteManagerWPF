@@ -78,6 +78,82 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
         }
 
         [Fact]
+        public void ReadWaypointsOnly_ShouldReadAllPoints()
+        {
+            // Arrange
+            var parser = new GpxFileParser();
+            var filePath = Path.Combine(testDataPath, "Test1.wptonly.gpx");
+
+            // Act
+            var (points, routeName) = parser.Read(filePath);
+
+            // Assert
+            Assert.Equal(4, points.Count);
+            Assert.Equal("Test1", routeName);
+            Assert.Equal("The Start", points[0].Name);
+            Assert.Equal(50.451688, points[0].Position.Lat, 6);
+            Assert.Equal(8.029562, points[0].Position.Lng, 6);
+            Assert.Equal("Am Holzbach 3", points[2].Name);
+            Assert.Equal("The Finish", points[3].Name);
+            Assert.False(points[0].IsFinish);
+            Assert.False(points[1].IsFinish);
+            Assert.False(points[2].IsFinish);
+            Assert.True(points[3].IsFinish);
+        }
+
+        [Fact]
+        public void ReadRoutePointsWithStops_ShouldReadAllPointsAndStops()
+        {
+            // Arrange
+            var parser = new GpxFileParser();
+            var filePath = Path.Combine(testDataPath, "Test1.rpt.withstops.gpx");
+
+            // Act
+            var (points, routeName) = parser.Read(filePath);
+
+            // Assert
+            Assert.Equal(4, points.Count);
+            Assert.Equal("Test1", routeName);
+            Assert.Equal("The Start", points[0].Name);
+            Assert.False(points[0].IsStop);
+            Assert.False(points[0].IsFinish);
+            Assert.True(points[1].IsStop);
+            Assert.False(points[1].IsFinish);
+            Assert.Equal("Am Holzbach 3", points[2].Name);
+            Assert.False(points[2].IsStop);
+            Assert.False(points[2].IsFinish);
+            Assert.Equal("The Finish", points[3].Name);
+            Assert.False(points[3].IsStop);
+            Assert.True(points[3].IsFinish);
+        }
+
+        [Fact]
+        public void ReadWaypointsAndRoutePointsWithStops_ShouldReadAllPointsAndStops()
+        {
+            // Arrange
+            var parser = new GpxFileParser();
+            var filePath = Path.Combine(testDataPath, "Test1.wpt+rpt.withstops.gpx");
+
+            // Act
+            var (points, routeName) = parser.Read(filePath);
+
+            // Assert
+            Assert.Equal(4, points.Count);
+            Assert.Equal("Test1", routeName);
+            Assert.Equal("The Start", points[0].Name);
+            Assert.False(points[0].IsStop);
+            Assert.False(points[0].IsFinish);
+            Assert.True(points[1].IsStop);
+            Assert.False(points[1].IsFinish);
+            Assert.Equal("Am Holzbach 3", points[2].Name);
+            Assert.False(points[2].IsStop);
+            Assert.False(points[2].IsFinish);
+            Assert.Equal("The Finish", points[3].Name);
+            Assert.False(points[3].IsStop);
+            Assert.True(points[3].IsFinish);
+        }
+
+        [Fact]
         public void WriteAndRead_ShouldProduceSamePoints()
         {
             // Arrange
@@ -85,8 +161,10 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
             var filePath = Path.Combine(testDataPath, "test_output.gpx");
             var originalPoints = new[]
             {
-                new RoutePoint(1, new GMap.NET.PointLatLng(52.0, 4.0)) { Name = "Point 1" },
-                new RoutePoint(2, new GMap.NET.PointLatLng(52.1, 4.1)) { Name = "Point 2" }
+                new RoutePoint(1, new GMap.NET.PointLatLng(50.451688, 8.029562)) { Name = "The Start", IsStop = false },
+                new RoutePoint(2, new GMap.NET.PointLatLng(50.447725, 8.068956)) { IsStop = true },
+                new RoutePoint(3, new GMap.NET.PointLatLng(50.460410, 8.090680)) { Name = "Am Holzbach 3", IsStop = false },
+                new RoutePoint(4, new GMap.NET.PointLatLng(50.462440, 8.055320)) { Name = "The Finish", IsStop = false, IsFinish = true }
             }.ToList();
 
             try
@@ -103,7 +181,12 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
                     Assert.Equal(originalPoints[i].Name, readPoints[i].Name);
                     Assert.Equal(originalPoints[i].Position.Lat, readPoints[i].Position.Lat, 6);
                     Assert.Equal(originalPoints[i].Position.Lng, readPoints[i].Position.Lng, 6);
+                    Assert.Equal(originalPoints[i].IsStop, readPoints[i].IsStop);
                 }
+                Assert.False(readPoints[0].IsFinish);
+                Assert.False(readPoints[1].IsFinish);
+                Assert.False(readPoints[2].IsFinish);
+                Assert.True(readPoints[3].IsFinish);
             }
             finally
             {
