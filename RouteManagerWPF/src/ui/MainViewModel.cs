@@ -8,10 +8,8 @@ using GMap.NET.MapProviders;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows.Controls;
 using System.Collections.Specialized;
-using System.Linq;
 using nl.siwoc.RouteManager.fileFormats;
 using System.Windows.Threading;
-using System.Collections.Generic;
 using System.IO;
 
 namespace nl.siwoc.RouteManager.ui
@@ -325,17 +323,33 @@ namespace nl.siwoc.RouteManager.ui
         {
             var flagMarker = (FlagMarker)point.Marker.Shape;
             flagMarker.ClickCommand = new RelayCommand(() => SelectedPoint = point);
-            flagMarker.PositionChangedCommand = new RelayCommand<PointLatLng>(newPos => {
+            flagMarker.PositionChangedCommand = new RelayCommand<Point>(async newScreenPos => {
+                var newPos = mapControl.FromLocalToLatLng((int)newScreenPos.X, (int)newScreenPos.Y);
                 if (point.Position != newPos)
                 {
-                    point.Position = newPos;
-                    ScheduleRouteUpdate();
+                    // Calculate distance between old and new position in screen coordinates
+                    var oldScreenPos = mapControl.FromLatLngToLocal(point.Position);
+                    var diffX = newScreenPos.X - oldScreenPos.X;
+                    var diffY = newScreenPos.Y - oldScreenPos.Y;
+                    // Only update if moved more than 5 pixels
+                    if (Math.Abs(diffX) >= 5 || Math.Abs(diffY) >= 5)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Drag distance: {Math.Sqrt(Math.Pow(diffX, 2) + Math.Pow(diffY, 2))}");
+                        point.Position = newPos;
+                        var index = RoutePoints.IndexOf(point);
+                        var (distance, duration) = await routePolyline.UpdateRouteForDraggedPoint(RoutePoints, index);
+                        RouteDistance = distance;
+                        RouteDuration = Utils.ConvertRouteDuration(duration);
+                    }
                 }
             });
             flagMarker.DropCommand = new RelayCommand<PointLatLng>(newPos => {
                 point.Position = GetNearestPointOnRoad(newPos);
                 EnrichRoutePoint(point);
-                ScheduleRouteUpdate();
+                // Clear temporary segments before full update
+                routePolyline.ClearTemporarySegments();
+                // Use full update on drop to ensure all segments are correct
+                ScheduleRouteUpdate(); 
             });
         }
 
@@ -358,9 +372,9 @@ namespace nl.siwoc.RouteManager.ui
         {
             if (!ConfirmUnsavedChanges()) return;
 
-            mapControl.Markers.Clear();
             RoutePoints.Clear();
-            routePolyline.Clear(); // will not be cleared automatically by recreation as with OpenRoute
+            routePolyline.Clear(); // clears segment polylines, will not be cleared automatically by recreation as with OpenRoute
+            mapControl.Markers.Clear(); // clears FlagMarkers
             StatusMessage = "New route created";
             RouteName = "New Route";
             CurrentFileName = null;

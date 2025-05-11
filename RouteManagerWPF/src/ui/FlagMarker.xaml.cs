@@ -68,11 +68,11 @@ namespace nl.siwoc.RouteManager.ui
                 var currentPoint = e.GetPosition(this);
                 var diff = currentPoint - _dragStartPoint;
                 
-                if (Math.Abs(diff.X) >= 5 || Math.Abs(diff.Y) >= 5) // Only move if we've actually dragged
+                // Only move if we've actually dragged some distance
+                if (Math.Abs(diff.X) >= 5 || Math.Abs(diff.Y) >= 5) 
                 {
-                    var p = e.GetPosition(mapControl);
-                    var newPosition = mapControl.FromLocalToLatLng((int)p.X, (int)p.Y);
-                    PositionChangedCommand?.Execute(newPosition);
+                    var newScreenPosition = e.GetPosition(mapControl);
+                    PositionChangedCommand?.Execute(newScreenPosition);
                     e.Handled = true;
                 }
             }
