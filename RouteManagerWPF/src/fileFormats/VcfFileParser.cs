@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using GMap.NET;
@@ -101,7 +98,7 @@ namespace nl.siwoc.RouteManager.fileFormats
                 var vcfPath = Path.Combine(filePath, $"{prefix}{index:D3} {safeFileName}.vcf");
                 
                 // Add prefix and index to the name in VCF
-                var fullName = $"{prefix}{index:D3} {point.Name}";
+                var fullName = $"{prefix}{index:D3} {FileUtils.ConvertToAscii(point.Name)}";
                 var escapedName = FileUtils.EscapeVcfName(fullName);
                 
                 var vcfContent = new List<string>

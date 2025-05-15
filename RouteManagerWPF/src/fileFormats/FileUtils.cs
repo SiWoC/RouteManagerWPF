@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -10,6 +9,57 @@ namespace nl.siwoc.RouteManager.fileFormats
     {
         private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
         private static readonly Regex MultipleSpaces = new Regex(@"\s+", RegexOptions.Compiled);
+
+        public static string ConvertToAscii(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            
+            return text
+                // German umlauts
+                .Replace("ß", "ss")
+                .Replace("ä", "a")
+                .Replace("ö", "o")
+                .Replace("ü", "u")
+                .Replace("Ä", "A")
+                .Replace("Ö", "O")
+                .Replace("Ü", "U")
+                // French accents
+                .Replace("é", "e")
+                .Replace("è", "e")
+                .Replace("ê", "e")
+                .Replace("ë", "e")
+                .Replace("É", "E")
+                .Replace("È", "E")
+                .Replace("Ê", "E")
+                .Replace("Ë", "E")
+                .Replace("à", "a")
+                .Replace("â", "a")
+                .Replace("À", "A")
+                .Replace("Â", "A")
+                .Replace("î", "i")
+                .Replace("ï", "i")
+                .Replace("Î", "I")
+                .Replace("Ï", "I")
+                .Replace("ô", "o")
+                .Replace("Ô", "O")
+                .Replace("ù", "u")
+                .Replace("û", "u")
+                .Replace("Ù", "U")
+                .Replace("Û", "U")
+                .Replace("ç", "c")
+                .Replace("Ç", "C")
+                // Other common European characters
+                .Replace("ñ", "n")
+                .Replace("Ñ", "N")
+                .Replace("å", "a")
+                .Replace("Å", "A")
+                .Replace("æ", "ae")
+                .Replace("Æ", "AE")
+                .Replace("ø", "oe")
+                .Replace("Ø", "OE")
+                .Replace("œ", "oe")
+                .Replace("Œ", "OE");
+        }
 
         public static Encoding DetectEncoding(string filePath)
         {
@@ -71,6 +121,9 @@ namespace nl.siwoc.RouteManager.fileFormats
         public static string CreateWindowsSafeFileName(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
+
+            // Convert to ASCII first
+            name = ConvertToAscii(name);
 
             // Replace invalid characters with space
             var safeName = new string(name.Select(c => InvalidFileNameChars.Contains(c) ? ' ' : c).ToArray());

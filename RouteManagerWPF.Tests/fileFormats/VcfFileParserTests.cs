@@ -146,5 +146,56 @@ namespace nl.siwoc.RouteManager.Tests.fileFormats
                 }
             }
         }
+
+        [Fact]
+        public void Write_WithSpecialChars_CreatesAsciiVcfFiles()
+        {
+            // Arrange
+            var points = new[]
+            {
+                new RoutePoint(1, new PointLatLng(47.583960, 12.572730)) { Name = "Straße 1" },
+                new RoutePoint(2, new PointLatLng(47.584960, 12.573730)) { Name = "äöü ÄÖÜ" }
+            }.ToList();
+            points.Last().IsFinish = true;
+            var outputPath = Path.Combine(testDataPath, "test_output");
+
+            try
+            {
+                // Act
+                _parser.Write(outputPath, points, "R1");
+
+                // Assert
+                var files = Directory.GetFiles(Path.Combine(outputPath, "destinations"), "R1*.vcf");
+                Assert.Equal(2, files.Length);
+                Assert.Contains("R1001 Strasse 1.vcf", files[0]);
+                Assert.Contains("R1002 aou AOU.vcf", files[1]);
+
+                // Verify content of first file
+                var content = File.ReadAllLines(files[0]);
+                Assert.Contains("BEGIN:VCARD", content);
+                Assert.Contains("VERSION:3.0", content);
+                Assert.Contains("N:R1001 Strasse 1;;;;", content);
+                Assert.Contains("FN:R1001 Strasse 1", content);
+                Assert.Contains("GEO:47.583960;12.572730", content);
+                Assert.Contains("END:VCARD", content);
+
+                // Verify content of second file
+                content = File.ReadAllLines(files[1]);
+                Assert.Contains("BEGIN:VCARD", content);
+                Assert.Contains("VERSION:3.0", content);
+                Assert.Contains("N:R1002 aou AOU;;;;", content);
+                Assert.Contains("FN:R1002 aou AOU", content);
+                Assert.Contains("GEO:47.584960;12.573730", content);
+                Assert.Contains("END:VCARD", content);
+            }
+            finally
+            {
+                // Cleanup
+                if (Directory.Exists(outputPath))
+                {
+                    Directory.Delete(outputPath, true);
+                }
+            }
+        }
     }
 } 

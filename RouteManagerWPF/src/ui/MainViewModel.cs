@@ -164,6 +164,7 @@ namespace nl.siwoc.RouteManager.ui
                     routeName = value;
                     IsDirty = true;
                     OnPropertyChanged();
+                    UpdateWindowTitle();
                 }
             }
         }
