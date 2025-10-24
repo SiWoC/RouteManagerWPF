@@ -99,12 +99,12 @@ namespace nl.siwoc.RouteManager.ui
         public SettingsViewModel(MainViewModel mainViewModel)
         {
             this.mainViewModel = mainViewModel;
-            StartLatitude = Settings.LoadStartLatitude();
-            StartLongitude = Settings.LoadStartLongitude();
-            RoadSnapDistance = Settings.LoadRoadSnapDistance();
+            StartLatitude = Settings.GetStartLatitude();
+            StartLongitude = Settings.GetStartLongitude();
+            RoadSnapDistance = Settings.GetRoadSnapDistance();
             GoogleApiKey = Settings.LoadGoogleApiKey();
             UpdateAvailableRoutingProviders();
-            SelectedRoutingProvider = AvailableRoutingProviders.FirstOrDefault(p => p.GetType().Name == Settings.LoadRoutingProviderName()) 
+            SelectedRoutingProvider = AvailableRoutingProviders.FirstOrDefault(p => p.GetType().Name == Settings.GetRoutingProviderName()) 
                 ?? AvailableRoutingProviders[0];
         }
 

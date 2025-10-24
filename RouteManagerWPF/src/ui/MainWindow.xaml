@@ -54,24 +54,51 @@
 
         <!-- Status Bar -->
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem>
-                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" />
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal" >
-                    <Button Command="{Binding FitToRouteCommand}" Background="Transparent" BorderThickness="0" Padding="0">
-                        <Image Source="/resources/nl/siwoc/RouteManager/ui/zoom-fit.1024x1024.png" Height="32" Width="32"/>
-                    </Button>
-                    <TextBlock Text="{Binding ElementName=mapControl, Path=Zoom, StringFormat='Zoom [{0}]:'}" VerticalAlignment="Center"/>
-                    <Slider Width="200" 
-                            Minimum="{Binding ElementName=mapControl, Path=MinZoom}"
-                            Maximum="{Binding ElementName=mapControl, Path=MaxZoom}"
-                            Value="{Binding ElementName=mapControl, Path=Zoom}"
-                            TickFrequency="1"
-                            IsSnapToTickEnabled="True"
-                             VerticalAlignment="Center"/>
-                </StackPanel>
-            </StatusBarItem>
+            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType=StatusBar}, Path=ActualWidth}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="310"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Status Message (Left) -->
+                <StatusBarItem Grid.Column="0" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" />
+                </StatusBarItem>
+                
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="1"
+                              Background="{x:Static SystemColors.ControlDarkBrush}"
+                              Width="2"/>
+
+                <StatusBarItem Grid.Column="2" HorizontalAlignment="Right" Width="100">
+                    <TextBlock Text="{Binding RoutingApiCallCount, StringFormat='API Calls: {0}'}" VerticalAlignment="Center"/>
+                </StatusBarItem>
+                
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="3"
+                              Background="{x:Static SystemColors.ControlDarkBrush}"
+                              Width="2"/>
+
+                <!-- Zoom Controls (Right) -->
+                <StatusBarItem Grid.Column="4" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal" >
+                        <Button Command="{Binding FitToRouteCommand}" Background="Transparent" BorderThickness="0" Padding="0">
+                            <Image Source="/resources/nl/siwoc/RouteManager/ui/zoom-fit.1024x1024.png" Height="32" Width="32"/>
+                        </Button>
+                        <TextBlock Text="{Binding ElementName=mapControl, Path=Zoom, StringFormat='Zoom [{0}]:'}" VerticalAlignment="Center"/>
+                        <Slider Width="200" 
+                                Minimum="{Binding ElementName=mapControl, Path=MinZoom}"
+                                Maximum="{Binding ElementName=mapControl, Path=MaxZoom}"
+                                Value="{Binding ElementName=mapControl, Path=Zoom}"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                 VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StatusBarItem>
+            </Grid>
         </StatusBar>
 
         <!-- Main Content -->

@@ -26,12 +26,14 @@ namespace nl.siwoc.RouteManager.ui
         private RoutePoint draggedItem;
         private readonly RoutePolyline routePolyline;
         private readonly DispatcherTimer updateRouteTimer;
+        private readonly DispatcherTimer dragDebounceTimer;
         private bool routeUpdatePending;
         private string routeName = "New Route";
         private double routeDistance;
         private string routeDurationDisplay;
         private bool isDirty;
         private string currentFileName;
+        private int routingApiCallCount = 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -223,6 +225,24 @@ namespace nl.siwoc.RouteManager.ui
             }
         }
 
+        public int RoutingApiCallCount
+        {
+            get => routingApiCallCount;
+            set
+            {
+                if (routingApiCallCount != value)
+                {
+                    routingApiCallCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void IncrementRoutingApiCallCount()
+        {
+            RoutingApiCallCount++;
+        }
+
         public ICommand NewRouteCommand { get; }
         public ICommand OpenRouteCommand { get; }
         public ICommand SaveRouteCommand { get; }
@@ -237,7 +257,7 @@ namespace nl.siwoc.RouteManager.ui
         {
             this.mapControl = mapControl;
             this.mapControl.ShowCenter = false;
-            center = new PointLatLng(Settings.LoadStartLatitude(), Settings.LoadStartLongitude());
+            center = new PointLatLng(Settings.GetStartLatitude(), Settings.GetStartLongitude());
 
             routePoints.CollectionChanged += RoutePoints_CollectionChanged;
 
@@ -251,6 +271,21 @@ namespace nl.siwoc.RouteManager.ui
                     var (distance, duration) = await routePolyline.UpdateRoute(RoutePoints);
                     RouteDistance = distance;
                     RouteDuration = Utils.ConvertRouteDuration(duration);
+                }
+            };
+
+            // Initialize drag debounce timer
+            dragDebounceTimer = new DispatcherTimer();
+            dragDebounceTimer.Interval = TimeSpan.FromSeconds(1);
+            dragDebounceTimer.Tick += async (s, e) => {
+                dragDebounceTimer.Stop();
+                if (draggedItem != null)
+                {
+                    var index = RoutePoints.IndexOf(draggedItem);
+                    var (distance, duration) = await routePolyline.UpdateRouteForDraggedPoint(RoutePoints, index);
+                    RouteDistance = distance;
+                    RouteDuration = Utils.ConvertRouteDuration(duration);
+                    draggedItem = null;
                 }
             };
 
@@ -271,10 +306,11 @@ namespace nl.siwoc.RouteManager.ui
             }
 
             showTrafficLayer = Settings.LoadShowTrafficLayer();
-            MapProvider = Settings.LoadMapProvider();
+            MapProvider = Settings.GetMapProvider();
 
             // Initialize route polyline after provider is set
             routePolyline = new RoutePolyline(mapControl);
+            RouteSegmentsFactory.RoutingApiCallMade += (sender, e) => IncrementRoutingApiCallCount();
         }
 
         internal void ScheduleRouteUpdate()
@@ -337,14 +373,19 @@ namespace nl.siwoc.RouteManager.ui
                     {
                         System.Diagnostics.Debug.WriteLine($"Drag distance: {Math.Sqrt(Math.Pow(diffX, 2) + Math.Pow(diffY, 2))}");
                         point.Position = newPos;
-                        var index = RoutePoints.IndexOf(point);
-                        var (distance, duration) = await routePolyline.UpdateRouteForDraggedPoint(RoutePoints, index);
-                        RouteDistance = distance;
-                        RouteDuration = Utils.ConvertRouteDuration(duration);
+                        draggedItem = point;
+                        
+                        // Reset the debounce timer - will trigger API call after 1 second of no movement
+                        dragDebounceTimer.Stop();
+                        dragDebounceTimer.Start();
                     }
                 }
             });
             flagMarker.DropCommand = new RelayCommand<PointLatLng>(newPos => {
+                // Stop the drag debounce timer since we're dropping
+                dragDebounceTimer.Stop();
+                draggedItem = null;
+                
                 point.Position = GetNearestPointOnRoad(newPos);
                 EnrichRoutePoint(point);
                 // Clear temporary segments before full update
@@ -542,10 +583,7 @@ namespace nl.siwoc.RouteManager.ui
         private PointLatLng GetNearestPointOnRoad(PointLatLng point)
         {
             // Get a route that passes through our point
-            var route = Settings.LoadRoutingProvider().GetRoute(
-                point,
-                point,
-                false, false, (int)mapControl.Zoom);
+            var route = RouteSegmentsFactory.GetRouteSegment(point, point, (int)mapControl.Zoom);
 
             if (route == null || route.Points.Count == 0) return point;
 
@@ -556,7 +594,7 @@ namespace nl.siwoc.RouteManager.ui
 
             // Check if the nearest point is within the configured distance
             var distance = mapProvider.Projection.GetDistance(nearestPoint, point);
-            if (distance > Settings.LoadRoadSnapDistance() / 1000.0) // Convert meters to kilometers
+            if (distance > Settings.GetRoadSnapDistance() / 1000.0) // Convert meters to kilometers
             {
                 StatusMessage = "No road found at clicked point";
                 return point;

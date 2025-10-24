@@ -75,7 +75,8 @@ namespace nl.siwoc.RouteManager.ui
                 var end = pointList[i + 1].Position;
                 
                 var zoom = await Application.Current.Dispatcher.InvokeAsync(() => (int)mapControl.Zoom);
-                MapRoute mapRoute = await Task.Run(() => Settings.LoadRoutingProvider().GetRoute(start, end, false, false, zoom));
+                MapRoute mapRoute = await Task.Run(() => RouteSegmentsFactory.GetRouteSegment(start, end, zoom));
+                
                 if (mapRoute != null)
                 {
                     await Application.Current.Dispatcher.InvokeAsync(() => {
@@ -150,7 +151,7 @@ namespace nl.siwoc.RouteManager.ui
         {
             if (string.IsNullOrEmpty(duration)) return 0;
 
-            var provider = Settings.LoadRoutingProviderName();
+            var provider = Settings.GetRoutingProviderName();
             if (provider == Settings.GoogleMapProviderName)
             {
                 // Google format: "2 hours 23 mins"

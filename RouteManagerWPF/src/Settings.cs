@@ -54,7 +54,7 @@ namespace nl.siwoc.RouteManager
             };
         }
 
-        public static string LoadRoutingProviderName()
+        public static string GetRoutingProviderName()
         {
             if (cachedRoutingProviderName != null)
                 return cachedRoutingProviderName;
@@ -79,12 +79,12 @@ namespace nl.siwoc.RouteManager
             return cachedRoutingProviderName;
         }
 
-        public static RoutingProvider LoadRoutingProvider()
+        public static RoutingProvider GetRoutingProvider()
         {
             if (cachedRoutingProvider != null)
                 return cachedRoutingProvider;
 
-            var routingProviderName = LoadRoutingProviderName();
+            var routingProviderName = GetRoutingProviderName();
             if (routingProviderName.Equals(GoogleMapProviderName))
             {
                 var apiKey = LoadGoogleApiKey();
@@ -138,7 +138,7 @@ namespace nl.siwoc.RouteManager
             }
         }
 
-        public static GMapProvider LoadMapProvider()
+        public static GMapProvider GetMapProvider()
         {
             if (cachedMapProvider != null)
                 return cachedMapProvider;
@@ -190,7 +190,7 @@ namespace nl.siwoc.RouteManager
             cachedStartLongitude = longitude;
         }
 
-        public static double LoadStartLatitude()
+        public static double GetStartLatitude()
         {
             if (cachedStartLatitude.HasValue)
                 return cachedStartLatitude.Value;
@@ -204,7 +204,7 @@ namespace nl.siwoc.RouteManager
             return result;
         }
 
-        public static double LoadStartLongitude()
+        public static double GetStartLongitude()
         {
             if (cachedStartLongitude.HasValue)
                 return cachedStartLongitude.Value;
@@ -218,7 +218,7 @@ namespace nl.siwoc.RouteManager
             return result;
         }
 
-        public static int LoadRoadSnapDistance()
+        public static int GetRoadSnapDistance()
         {
             if (cachedRoadSnapDistance.HasValue)
                 return cachedRoadSnapDistance.Value;

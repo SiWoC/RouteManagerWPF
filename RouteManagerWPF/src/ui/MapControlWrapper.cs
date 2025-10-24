@@ -14,6 +14,12 @@ namespace nl.siwoc.RouteManager.ui
             // Configure GMap.NET
             GMapProvider.WebProxy = null;
             GMaps.Instance.Mode = AccessMode.ServerAndCache;
+            GMaps.Instance.UseDirectionsCache = true;
+            GMaps.Instance.UseGeocoderCache = true;
+            GMaps.Instance.UseMemoryCache = true;
+            GMaps.Instance.UsePlacemarkCache = true;
+            GMaps.Instance.UseRouteCache = true;
+            GMaps.Instance.UseUrlCache = true;
 
             // Initialize map settings
             ShowTileGridLines = false;
