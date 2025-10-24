@@ -360,7 +360,7 @@ namespace nl.siwoc.RouteManager.ui
         {
             var flagMarker = (FlagMarker)point.Marker.Shape;
             flagMarker.ClickCommand = new RelayCommand(() => SelectedPoint = point);
-            flagMarker.PositionChangedCommand = new RelayCommand<Point>(async newScreenPos => {
+            flagMarker.PositionChangedCommand = new RelayCommand<Point>(newScreenPos => {
                 var newPos = mapControl.FromLocalToLatLng((int)newScreenPos.X, (int)newScreenPos.Y);
                 if (point.Position != newPos)
                 {

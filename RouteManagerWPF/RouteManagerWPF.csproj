@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyName>RouteManager</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>SiWoC</Authors>
     <Company>SiWoC</Company>
     <Product>Route Manager</Product>
@@ -40,5 +40,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+
+  <Target Name="CreateZip" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <ZipFileName>RouteManager-v$(Version).zip</ZipFileName>
+      <ZipPath>$(PublishDir)..\$(ZipFileName)</ZipPath>
+    </PropertyGroup>
+    <Exec Command="powershell -Command &quot;$files = @('$(PublishDir)RouteManager.exe', '$(PublishDir)sni.dll', '$(PublishDir)SQLite.Interop.dll'); $existingFiles = $files | Where-Object { Test-Path $_ }; Compress-Archive -Path $existingFiles -DestinationPath '$(ZipPath)' -Force&quot;" />
+    <Message Text="Created zip file: $(ZipPath)" Importance="high" />
+  </Target>
 
 </Project> 
